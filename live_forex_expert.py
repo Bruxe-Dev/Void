@@ -1,3 +1,4 @@
+import sys
 import time
 import pickle
 import torch
@@ -6,6 +7,9 @@ import numpy as np
 import pandas as pd
 import MetaTrader5 as mt5
 from datetime import datetime
+
+# Ensure prints flush immediately in live terminal sessions
+sys.stdout.reconfigure(line_buffering=True)
 
 # ==========================================
 # CONFIGURATION & HYPERPARAMETERS
