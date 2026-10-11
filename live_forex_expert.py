@@ -10,7 +10,7 @@ SYMBOL = "EURUSD"
 TIMEFRAME = mt5.TIMEFRAME_H1
 LOOKBACK_WINDOW = 24
 RISK_PERCENTAGE = 0.01  
-MT5_PATH = "C:/Program Files/MetaTrader 5/terminal64.exe"
+MT5_PATH = "C:\Program Files\MetaTrader 5\terminal64.exe"
 ACCOUNT_NUMBER = 5057177985
 
 def calculate_position_size(balance: float, atr: float, symbol: str) -> float:
