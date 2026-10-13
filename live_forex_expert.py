@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import MetaTrader5 as mt5
 from datetime import datetime
+from regime_filter import evaluate_live_regime  # Step 1: ADX + Hurst regime gate
 
 # Ensure prints flush immediately in live terminal sessions
 sys.stdout.reconfigure(line_buffering=True)
@@ -21,7 +22,8 @@ RISK_PERCENTAGE = 0.01
 MT5_PATH = r"C:\Program Files\MetaTrader 5\terminal64.exe"
 ACCOUNT_NUMBER = 5057177985
 MAGIC_NUMBER = 202610
-BARS_TO_FETCH = 100
+BARS_TO_FETCH = 500  # was 100. Regime filter needs >=169 closed bars for Wilder/Hurst convergence.
+                     # Existing features (rolling-14 ATR, last 24 rows) are unaffected by the longer history.
 CYCLE_INTERVAL_SECONDS = 3600
 
 # ==========================================
@@ -230,6 +232,21 @@ def run_trading_cycle():
     print(f"    - LSTM Probabilities    [SL, Expiry, TP]: {np.round(lstm_probs[0], 4).tolist()}")
     print(f"    - Meta-Manager Probs    [SL, Expiry, TP]: {np.round(meta_probs, 4).tolist()}")
     print(f"    - Selected Model Intent: Class {final_signal} ({signal_labels.get(final_signal, 'Unknown')})")
+
+    # ------------------------------------------------------------------
+    # STEP 1: REGIME FILTER (hard override of the Meta-Manager)
+    # Evaluated on CLOSED bars only: copy_rates_from_pos(..., 0, N) puts the
+    # still-forming candle in the last row, so we drop it. The gate can only
+    # veto trades (force Class 1); it can never create one. Any internal error
+    # inside evaluate_live_regime() resolves to regime_on=False (fail-safe).
+    # ------------------------------------------------------------------
+    regime = evaluate_live_regime(df.iloc[:-1])
+    print(f"    - Regime Filter [{regime.bar_time}]: ADX {regime.adx:.2f} "
+          f"(+DI {regime.plus_di:.2f} / -DI {regime.minus_di:.2f}) | Hurst {regime.hurst:.3f} "
+          f"-> {'ON' if regime.regime_on else 'OFF'} ({regime.reason})")
+    if not regime.regime_on and final_signal != 1:
+        print(f"    - [REGIME VETO] Meta-Manager intent Class {final_signal} overridden -> Class 1 (Stand Down).")
+        final_signal = 1
     
     # Check for existing positions to prevent duplicate entries
     open_positions = mt5.positions_get(symbol=SYMBOL)
@@ -312,3 +329,4 @@ if __name__ == "__main__":
         print("\n[!] KeyboardInterrupt received. Gracefully shutting down MT5 and exiting...")
         mt5.shutdown()
         print("[*] Bot successfully stopped.")
+        

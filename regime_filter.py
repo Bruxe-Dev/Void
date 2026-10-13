@@ -35,7 +35,12 @@ ADX_ENTER_THRESHOLD = 25.0   # regime switches ON when ADX rises to/above this
 ADX_EXIT_THRESHOLD = 20.0    # regime switches OFF only when ADX falls below this
 HURST_WINDOW = 128           # bars (~5.3 trading days on H1)
 HURST_MAX_LAG = 20           # lags 2..20 used for the log-log scaling regression
-HURST_THRESHOLD = 0.52       # > 0.5 = persistent; margin absorbs estimator noise
+HURST_THRESHOLD = 0.55       # > 0.5 = persistent; margin absorbs estimator noise
+USE_HURST_CONFIRMATION = True
+# Synthetic sweep (20k H1 bars each), share of bars with the gate ON:
+#   ADX 25/20 alone      -> random walk 49% | OU chop 28% | trend 93%
+#   ADX 25/20 + H>0.55   -> random walk 18% | OU chop  2% | trend 90%
+# ADX alone cannot separate a noisy random walk from a weak trend; Hurst can.
 
 # Wilder smoothing has infinite memory: residual weight of the seed after k bars
 # is (1 - 1/n)^k. For n=14, k=140 -> 3.2e-5, k=400 -> 1.4e-13. We require at
@@ -193,7 +198,7 @@ def compute_regime_features(
     adx_period: int = ADX_PERIOD,
     adx_enter: float = ADX_ENTER_THRESHOLD,
     adx_exit: float = ADX_EXIT_THRESHOLD,
-    use_hurst_confirmation: bool = False,
+    use_hurst_confirmation: bool = USE_HURST_CONFIRMATION,
     hurst_window: int = HURST_WINDOW,
     hurst_max_lag: int = HURST_MAX_LAG,
     hurst_threshold: float = HURST_THRESHOLD,
