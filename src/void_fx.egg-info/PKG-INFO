@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: void_fx
+Version: 0.2.0
+Summary: Hierarchical Stacked-Ensemble Algorithmic Forex Trading System for MT5
+Author: Void Trading
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: MetaTrader5
+Requires-Dist: numpy
+Requires-Dist: pandas
+Requires-Dist: torch
+Requires-Dist: xgboost
+Requires-Dist: scikit-learn
+
+In order to force the logs into a File this will be the new script I'll need to run
+
+# # On Windows PowerShell (Standard in VS Code)
+- python -u live_forex_expert.py | Tee-Object -FilePath "trading_logs.txt"

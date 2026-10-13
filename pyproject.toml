@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "void_fx"
+version = "0.2.0"
+description = "Hierarchical Stacked-Ensemble Algorithmic Forex Trading System for MT5"
+authors = [{name = "Void Trading"}]
+readme = "readme.md"
+requires-python = ">=3.10"
+dependencies = [
+    "MetaTrader5",
+    "numpy",
+    "pandas",
+    "torch",
+    "xgboost",
+    "scikit-learn"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

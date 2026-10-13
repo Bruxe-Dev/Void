@@ -9,12 +9,8 @@ import MetaTrader5 as mt5
 from datetime import datetime
 from regime_filter import evaluate_live_regime  # Step 1: ADX + Hurst regime gate
 
-# Ensure prints flush immediately in live terminal sessions
 sys.stdout.reconfigure(line_buffering=True)
 
-# ==========================================
-# CONFIGURATION & HYPERPARAMETERS
-# ==========================================
 SYMBOL = "EURUSD"
 TIMEFRAME = mt5.TIMEFRAME_H1
 LOOKBACK_WINDOW = 24
