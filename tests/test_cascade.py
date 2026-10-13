@@ -1,4 +1,8 @@
-"""Unit and integrity tests for the Step 2 bidirectional cascade labeling and feature engineering."""
+import sys
+from pathlib import Path
+SRC = Path(__file__).resolve().parents[1] / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
 
 import numpy as np
 import pandas as pd
@@ -83,3 +87,8 @@ def test_prior_correct():
     prior = 0.333333  # 1/3
     p_true = prior_correct(p_bal, prior)
     assert np.isclose(p_true[0], prior, atol=1e-3)
+
+
+if __name__ == "__main__":
+    import sys
+    sys.exit(pytest.main(["-v", __file__]))
