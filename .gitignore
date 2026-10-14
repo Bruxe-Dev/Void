@@ -2,3 +2,4 @@
 *.pth
 .vscode/ 
 __pycache__/
+trading_logs.txt
