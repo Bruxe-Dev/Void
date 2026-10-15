@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 import MetaTrader5 as mt5
 from datetime import datetime
-from regime_filter import evaluate_live_regime  # Step 1: ADX + Hurst regime gate
+from regime_filter import evaluate_live_regime  
 
 sys.stdout.reconfigure(line_buffering=True)
 
@@ -18,28 +18,14 @@ RISK_PERCENTAGE = 0.01
 MT5_PATH = r"C:\Program Files\MetaTrader 5\terminal64.exe"
 ACCOUNT_NUMBER = 5057177985
 MAGIC_NUMBER = 202610
-BARS_TO_FETCH = 500  # was 100. Regime filter needs >=169 closed bars for Wilder/Hurst convergence.
-                     # Existing features (rolling-14 ATR, last 24 rows) are unaffected by the longer history.
+BARS_TO_FETCH = 500  
+
 CYCLE_INTERVAL_SECONDS = 3600
 
-# Regime filter mode (Step 1).
-#   False -> SHADOW mode: ADX/Hurst are computed and logged, a "WOULD VETO" line is
-#            printed, but the Meta-Manager decision is NOT changed.
-#   True  -> HARD VETO: signals in ranging regimes are forced to Class 1.
-# Calibration on 2021-2026 history (calibrate_regime.py) showed the hard veto
-# REMOVED better-than-average BUY signals for the current long-only models, in
-# both the training and test periods. Keep False until Step 2 models are retrained
-# and the filter is re-validated against them.
 REGIME_VETO_ENABLED = False
 
-# ==========================================
-# NEURAL NETWORK ARCHITECTURE
-# ==========================================
 class ForexLSTMAnalyst(nn.Module):
-    """
-    Long Short-Term Memory (LSTM) network matching the architecture 
-    trained in sprint1-data-engine.ipynb.
-    """
+
     def __init__(self, input_dim: int = 4, hidden_dim: int = 64, output_dim: int = 3, num_layers: int = 2):
         super(ForexLSTMAnalyst, self).__init__()
         self.lstm = nn.LSTM(
@@ -60,9 +46,7 @@ class ForexLSTMAnalyst(nn.Module):
 
 
 def calculate_position_size(balance: float, atr: float, symbol: str) -> float:
-    """
-    Computes volatility-adjusted position size based on cash risk budget and ATR stop distance.
-    """
+
     cash_risk_budget = balance * RISK_PERCENTAGE
     
     symbol_info = mt5.symbol_info(symbol)
@@ -73,7 +57,6 @@ def calculate_position_size(balance: float, atr: float, symbol: str) -> float:
     trade_tick_value = symbol_info.trade_tick_value
     volume_step = symbol_info.volume_step
     
-    # 1 lot risk for 1 ATR movement: atr / tick_size * tick_value
     risk_per_lot = (atr / trade_tick_size) * trade_tick_value
     
     if risk_per_lot <= 0:
@@ -81,16 +64,13 @@ def calculate_position_size(balance: float, atr: float, symbol: str) -> float:
         
     raw_lots = cash_risk_budget / risk_per_lot
     
-    # Precision rounding according to broker volume step
     step_precision = len(str(volume_step).split('.')[1]) if '.' in str(volume_step) else 0
     final_lots = round(round(raw_lots / volume_step) * volume_step, step_precision)
     return max(symbol_info.volume_min, min(symbol_info.volume_max, final_lots))
 
 
 def get_compatible_filling_mode(symbol_info) -> int:
-    """
-    Resolves the appropriate order execution filling mode supported by the broker.
-    """
+
     if symbol_info.filling_mode & 1:
         return mt5.ORDER_FILLING_FOK
     elif symbol_info.filling_mode & 2:
@@ -100,11 +80,7 @@ def get_compatible_filling_mode(symbol_info) -> int:
 
 
 def prepare_live_features(df: pd.DataFrame) -> tuple:
-    """
-    Transforms raw incoming OHLCV bars into aligned 2D (tabular) and 3D (temporal tensor) features.
-    Maintains exact column sequence matching the training phase:
-    ['log_return', 'volatility_atr', 'hour_cos', 'hour_sin']
-    """
+
     matrix = df.copy()
     matrix['log_return'] = np.log(matrix['close'] / matrix['close'].shift(1))
     matrix['high_low_span'] = matrix['high'] - matrix['low']
@@ -114,7 +90,6 @@ def prepare_live_features(df: pd.DataFrame) -> tuple:
     matrix['hour_cos'] = np.cos(2 * np.pi * matrix['hour'] / 24.0)
     matrix.dropna(inplace=True)
     
-    # IMPORTANT: Order must strictly match the training data split:
     feature_cols = ['log_return', 'volatility_atr', 'hour_cos', 'hour_sin']
     X_2d = matrix[feature_cols]
     
@@ -127,9 +102,7 @@ def prepare_live_features(df: pd.DataFrame) -> tuple:
 
 
 def connect_to_mt5() -> bool:
-    """
-    Initializes MT5 connection and verifies account authorization.
-    """
+
     if not mt5.initialize(path=MT5_PATH):
         print(f"[!] MT5 Initialization Failed: {mt5.last_error()}")
         return False
@@ -142,13 +115,11 @@ def connect_to_mt5() -> bool:
     if account_info.login != ACCOUNT_NUMBER:
         print(f"[!] Warning: Active account is {account_info.login}, configured account is {ACCOUNT_NUMBER}.")
     
-    # Verify terminal Algo Trading permission
     terminal_info = mt5.terminal_info()
     if terminal_info and not terminal_info.trade_allowed:
         print("[!] Note: 'Algo Trading' is currently DISABLED in MT5 GUI (Tools -> Options -> Expert Advisors -> Allow Algo Trading).")
         print("    Ensure the 'Algo Trading' button in MT5 toolbar is turned ON (green) for live trade execution.")
 
-    # Ensure symbol is active in Market Watch
     if not mt5.symbol_select(SYMBOL, True):
         print(f"[!] Failed to select {SYMBOL} in Market Watch: {mt5.last_error()}")
         return False
@@ -156,7 +127,6 @@ def connect_to_mt5() -> bool:
     return True
 
 
-# Global model instances
 xgb_analyst = None
 lstm_analyst = None
 meta_manager = None
@@ -167,18 +137,15 @@ def load_models():
     global xgb_analyst, lstm_analyst, meta_manager
     print("[*] Loading serialized models from local memory cache...")
     
-    # 1. XGBoost
     with open("xgb_analyst.pkl", "rb") as f:
         xgb_analyst = pickle.load(f)
     print(" [+] XGBoost Analyst loaded.")
         
-    # 2. PyTorch LSTM
     lstm_analyst = ForexLSTMAnalyst(input_dim=4, hidden_dim=64, num_layers=2, output_dim=3)
     lstm_analyst.load_state_dict(torch.load("lstm_analyst.pth", weights_only=True))
     lstm_analyst.eval()
     print(" [+] PyTorch LSTM Analyst loaded.")
         
-    # 3. Meta-Manager (Logistic Regression)
     with open("meta_manager.pkl", "rb") as f:
         meta_manager = pickle.load(f)
     print(" [+] Meta-Manager Stack loaded.")
@@ -196,7 +163,6 @@ def run_trading_cycle():
         print("[!] Execution cycle aborted due to connection failure.")
         return
 
-    # Fetch 100 historical hourly bars
     raw_rates = mt5.copy_rates_from_pos(SYMBOL, TIMEFRAME, 0, BARS_TO_FETCH)
     account_info = mt5.account_info()
     
@@ -216,21 +182,17 @@ def run_trading_cycle():
         mt5.shutdown()
         return
 
-    # Layer 1: XGBoost tabular inference
     xgb_probs = xgb_analyst.predict_proba(X_2d_live)
     
-    # Layer 2: PyTorch LSTM sequential inference
     X_3d_tensor = torch.tensor(X_3d_live, dtype=torch.float32)
     with torch.no_grad():
         lstm_logits = lstm_analyst(X_3d_tensor)
         lstm_probs = torch.nn.Softmax(dim=1)(lstm_logits).numpy()
         
-    # Layer 3: Blended feature stack into Logistic Regression Meta-Manager
     X_blend_live = np.hstack((xgb_probs, lstm_probs))
     final_signal = meta_manager.predict(X_blend_live)[0]
     meta_probs = meta_manager.predict_proba(X_blend_live)[0]
 
-    # Telemetry logging
     signal_labels = {0: "Stop Loss / Bearish", 1: "Time Expiry / Neutral", 2: "Take Profit / Bullish"}
     print(f"[*] Market Telemetry:")
     print(f"    - Current ATR(14): {current_atr:.5f}")
@@ -239,13 +201,6 @@ def run_trading_cycle():
     print(f"    - Meta-Manager Probs    [SL, Expiry, TP]: {np.round(meta_probs, 4).tolist()}")
     print(f"    - Selected Model Intent: Class {final_signal} ({signal_labels.get(final_signal, 'Unknown')})")
 
-    # ------------------------------------------------------------------
-    # STEP 1: REGIME FILTER (hard override of the Meta-Manager)
-    # Evaluated on CLOSED bars only: copy_rates_from_pos(..., 0, N) puts the
-    # still-forming candle in the last row, so we drop it. The gate can only
-    # veto trades (force Class 1); it can never create one. Any internal error
-    # inside evaluate_live_regime() resolves to regime_on=False (fail-safe).
-    # ------------------------------------------------------------------
     regime = evaluate_live_regime(df.iloc[:-1])
     print(f"    - Regime Filter [{regime.bar_time}]: ADX {regime.adx:.2f} "
           f"(+DI {regime.plus_di:.2f} / -DI {regime.minus_di:.2f}) | Hurst {regime.hurst:.3f} "
@@ -257,7 +212,6 @@ def run_trading_cycle():
         else:
             print(f"    - [REGIME SHADOW] Filter WOULD VETO Class {final_signal} (veto disabled, signal unchanged).")
     
-    # Check for existing positions to prevent duplicate entries
     open_positions = mt5.positions_get(symbol=SYMBOL)
     bot_positions = [p for p in open_positions if p.magic == MAGIC_NUMBER] if open_positions else []
     
@@ -301,7 +255,6 @@ def run_trading_cycle():
                 "type_filling": filling_mode,
             }
             
-            # Pre-flight order check
             check_result = mt5.order_check(order_request)
             if check_result is None or check_result.retcode != 0:
                 print(f"[!] Pre-order check failed: {check_result.comment if check_result else mt5.last_error()}")
@@ -338,4 +291,3 @@ if __name__ == "__main__":
         print("\n[!] KeyboardInterrupt received. Gracefully shutting down MT5 and exiting...")
         mt5.shutdown()
         print("[*] Bot successfully stopped.")
-        
