@@ -1,5 +1,5 @@
-#ifndef VOID_VAULT_AUTHORIZER_HPP
-#define VOID_VAULT_AUTHORIZER_HPP
+#ifndef VOID_VAULT_AUTH_HPP
+#define VOID_VAULT_AUTH_HPP
 
 class Authorizer {
 public:

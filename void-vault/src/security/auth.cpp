@@ -1,10 +1,11 @@
 #include "auth.hpp"
 
 Authorizer::Authorizer()
-	: Authorizer(false)
+    : authorized(false)
 {
 }
 
-bool Authorizer.isAuthorized() const{
-	return authorized;
+bool Authorizer::isAuthorized() const
+{
+    return authorized;
 }
