@@ -2,7 +2,7 @@
 
 Authorizer::Authorizer()
     : authorized(false),
-      password("void@2k26")
+      password("prototype-password")
 {
 }
 
