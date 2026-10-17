@@ -31,3 +31,31 @@ target_compile_features(
     void_vault_options
     INTERFACE cxx_std_20
 )
+
+if(MSVC)
+    target_compile_options(void_vault_options INTERFACE 
+        /w4
+        /permissive-
+        /sdl
+        /GS
+    )
+else()
+    target_compile_options(local_vault_options INTERFACE
+        -Wall
+        -Wextra
+        -Wpedantic
+        -Wconversion
+        -Wsign-conversion
+        -Wshadow
+        -Wformat=2
+    )
+
+    if(CMAKE_CXX_COMPILER_ID_MATCHES "GNU|Clang")
+        target_compile_options(
+            void_vault_options
+            INTERFACE 
+            -fstack-protector-strong
+        )
+
+    endif()
+endif()
