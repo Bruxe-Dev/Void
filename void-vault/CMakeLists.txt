@@ -106,3 +106,38 @@ if(VOID_VAULT_ENABLE_SANITIZERS)
         )
     endif()
 endif()
+
+if(EXISTS "${PROJECT_SOURCE_DIR}/src/main.cpp")
+    add_executable(void_vault
+        src/main.cpp
+    )
+
+    target_link_libraries(
+        PRIVATE void_vault_options
+    )
+
+    target_include_directories(
+        PRIVATE 
+        "s{PROJECT_SOURCE_DIR}/include"
+    )
+
+else()
+    message(STATUS
+        "Application target deferred: src/main.cpp "
+        "has not been created yet."
+    )
+
+endif()
+
+if(VOID_VAULT_BUILD_TESTS)
+    enable_testing()
+
+    if(EXISTS "${PROJECT_SOURCE_DIR/tests/CMakeLists.txt}")
+        add_subdirectory(tests)
+    else()
+        message(STATUS
+            "Test targets deferred: tests/CMakeLists.txt "
+            "has not been created yet."
+        )
+    endif()
+endif()
