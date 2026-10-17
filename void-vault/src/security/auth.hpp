@@ -1,13 +1,15 @@
-#ifndef VOID_VAULT_AUTH_HPP
-#define VOID_VAULT_AUTH_HPP
+#ifndef VOID_VAULT_AUTHORIZER_HPP
+#define VOID_VAULT_AUTHORIZER_HPP
 
-class Auth{
-	public:
-		Auth();
-		
-		bool isAuthorised() const;
-	private: 
-		bool is_authorised;
+class Authorizer {
+public:
+    Authorizer();
+
+    bool isAuthorized() const;
+
+private:
+    bool authorized;
 };
 
 #endif
+

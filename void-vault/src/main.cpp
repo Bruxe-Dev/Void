@@ -1,15 +1,20 @@
+
 #include <iostream>
+
+#include "security/auth.hpp"
 #include "vault/vault.hpp"
 
 int main()
 {
-    Vault vault;
-    std::cout << "Vault Unlocked: "
-              << std::boolalpha
-              << vault.isUnlocked();
+    Authorizer authorizer;
+    Vault vault(authorizer);
 
-    vault.lock();
-    std::cout << "\nAfter Lock(): "
-              << vault.isUnlocked();
+    std::cout << "Authorized: "
+              << std::boolalpha
+              << authorizer.isAuthorized() << '\n';
+
+    std::cout << "Vault unlocked: "
+              << vault.isUnlocked() << '\n';
+
     return 0;
 }
