@@ -6,6 +6,6 @@ int main()
     Vault vault;
     std::cout << "Vault Unlocked: "
               << std::boolalpha
-              << vault.is_unlocked();
+              << vault.isUnlocked();
     return 0;
 }

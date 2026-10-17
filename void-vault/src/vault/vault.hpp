@@ -5,7 +5,7 @@ class Vault{
 	public:
 		Vault();
 		
-		bool is_unlocked() const;
+		bool isUnlocked() const;
 	private:
 		bool is_unlocked;
 };
