@@ -38,7 +38,7 @@ int main()
               << vault.isUnlocked() << '\n';
 
     std::cout << "\n5. Lock the vault\n";
-    vault.lock();
+    << vault.lock();
 
     std::cout << "Authorized after locking: "
               << authorizer.isAuthorized() << '\n';

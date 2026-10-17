@@ -9,7 +9,7 @@ public:
 
 	bool verifyPassword(const std::string& attempted_password);
     bool isAuthorized() const;
-    void revokeAuthorization()
+    void revokeAuthorization();
 
 private:
     bool authorized;
