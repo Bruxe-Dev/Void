@@ -1,7 +1,7 @@
 #include "vault.hpp"
 
-Vault::Vault(Authorizer& authorizer)
-    : authorizer(authorizer),
+Vault::Vault(Authorizer& authorizer_ref)
+    : authorizer(authorizer_ref),
       is_unlocked(false)
 {
 }
