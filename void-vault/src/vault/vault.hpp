@@ -3,7 +3,7 @@
 
 class Vault{
 	public:
-		
+		Vault();
 	private:
 		
 };
