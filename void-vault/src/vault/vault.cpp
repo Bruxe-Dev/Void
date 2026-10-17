@@ -10,6 +10,17 @@ bool Vault::isUnlocked() const {
     return is_unlocked;
 }
 
+
+bool Vault::authenticate(const std::string& attempted_password) {
+    if (!authorizer.verifyPassword(attempted_password)) {
+        lock();
+        return false;
+    }
+
+    return true;
+}
+
+
 bool Vault::unlock(){
 	if(!authorizer.isAuthorized()){
 		return false;

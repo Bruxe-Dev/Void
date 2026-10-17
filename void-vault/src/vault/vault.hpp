@@ -9,6 +9,7 @@ public:
     explicit Vault(Authorizer& authorizer);
 
     bool isUnlocked() const;
+    bool authenticate(const std::string& attempted_password);
     bool unlock();
     void lock();
 
