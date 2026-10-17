@@ -9,6 +9,7 @@ public:
     explicit Vault(Authorizer& authorizer);
 
     bool isUnlocked() const;
+    bool unlock();
     void lock();
 
 private:

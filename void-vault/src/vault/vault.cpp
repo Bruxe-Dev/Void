@@ -10,6 +10,14 @@ bool Vault::isUnlocked() const {
     return is_unlocked;
 }
 
+bool Vault::unlock(){
+	if(!authorizer.isAuthorized()){
+		return false;
+	}
+	is_unlocked = true;
+	return true;
+}
+
 void Vault::lock(){
 	is_unlocked = false;
 }

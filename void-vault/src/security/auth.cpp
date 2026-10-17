@@ -1,11 +1,28 @@
+#include <iostream>
+
 #include "auth.hpp"
+#include "vault/vault.hpp"
 
-Authorizer::Authorizer()
-    : authorized(false)
+int main()
 {
-}
+    Authorizer authorizer;
+    Vault vault(authorizer);
 
-bool Authorizer::isAuthorized() const
-{
-    return authorized;
+    std::cout << std::boolalpha;
+
+    std::cout << "Authorized: "
+              << authorizer.isAuthorized() << '\n';
+
+    std::cout << "Vault unlocked: "
+              << vault.isUnlocked() << '\n';
+
+    bool unlocked = vault.unlock();
+
+    std::cout << "Unlock successful: "
+              << unlocked << '\n';
+
+    std::cout << "Vault unlocked: "
+              << vault.isUnlocked() << '\n';
+
+    return 0;
 }
