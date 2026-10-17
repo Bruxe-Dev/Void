@@ -40,7 +40,7 @@ if(MSVC)
         /GS
     )
 else()
-    target_compile_options(local_vault_options INTERFACE
+    target_compile_options(void_vault_options INTERFACE
         -Wall
         -Wextra
         -Wpedantic
@@ -50,7 +50,7 @@ else()
         -Wformat=2
     )
 
-    if(CMAKE_CXX_COMPILER_ID_MATCHES "GNU|Clang")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         target_compile_options(
             void_vault_options
             INTERFACE 
@@ -74,7 +74,7 @@ if(WIN32)
     endif()
 
 elseif(UNIX AND NOT APPLE)
-    if(CMAKE_CXX_COMPILER_ID_MATCHES "GNU|Clang")
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
         target_link_options(
             void_vault_options
             INTERFACE
@@ -84,7 +84,7 @@ elseif(UNIX AND NOT APPLE)
 endif()
 
 if(VOID_VAULT_ENABLE_SANITIZERS)
-    if(CMAKE_CXX_COMPILER_ID_MATCHES "GNU|Clang"
+    if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang"
        AND NOT WIN32)
         target_compile_options(
             void_vault_options
