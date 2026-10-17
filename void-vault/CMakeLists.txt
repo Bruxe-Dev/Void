@@ -110,6 +110,7 @@ endif()
 if(EXISTS "${PROJECT_SOURCE_DIR}/src/main.cpp")
     add_executable(void_vault
         src/main.cpp
+        src/vault/vault.cpp
     )
 
     target_link_libraries(
