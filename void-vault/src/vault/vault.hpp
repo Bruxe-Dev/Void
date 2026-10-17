@@ -4,8 +4,10 @@
 class Vault{
 	public:
 		Vault();
-	private:
 		
+		bool is_unlocked() const;
+	private:
+		bool is_unlocked;
 };
 
 #endif
