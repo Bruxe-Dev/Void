@@ -6,6 +6,8 @@ class Vault{
 		Vault();
 		
 		bool isUnlocked() const;
+		
+		void lock();
 	private:
 		bool is_unlocked;
 };

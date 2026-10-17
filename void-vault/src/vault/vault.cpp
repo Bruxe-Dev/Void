@@ -9,3 +9,6 @@ bool Vault::isUnlocked() const {
     return is_unlocked;
 }
 
+void Vault::lock(){
+	is_unlocked = false;
+}

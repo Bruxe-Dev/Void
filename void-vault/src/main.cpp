@@ -7,5 +7,9 @@ int main()
     std::cout << "Vault Unlocked: "
               << std::boolalpha
               << vault.isUnlocked();
+
+    vault.lock();
+    std::cout << "After Lock(): "
+              << vault.isUnlocked();
     return 0;
 }
