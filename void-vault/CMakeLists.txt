@@ -24,3 +24,10 @@ option(
     "Enable AddressSanitizer and UndefinedBehaviorSanitizer"
     OFF
 )
+
+add_library(void_vault_options INTERFACE)
+
+target_compile_features(
+    void_vault_options
+    INTERFACE cxx_std_20
+)
