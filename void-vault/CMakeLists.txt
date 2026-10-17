@@ -59,3 +59,50 @@ else()
 
     endif()
 endif()
+
+if(WIN32)
+    if(MSVC)
+        target_compile_options(
+            void_vault_options
+            INTERFACE /guard:cf
+        )
+        target_link_options(
+            void_vault_options
+            INTERFACE /guard:cf
+        )
+
+    endif()
+
+elseif(UNIX AND NOT APPLE)
+    if(CMAKE_CXX_COMPILER_ID_MATCHES "GNU|Clang")
+        target_link_options(
+            void_vault_options
+            INTERFACE
+            -wl,-z,relro,-z,now
+        )
+    endif()
+endif()
+
+if(VOID_VAULT_ENABLE_SANITIZERS)
+    if(CMAKE_CXX_COMPILER_ID_MATCHES "GNU|Clang"
+       AND NOT WIN32)
+        target_compile_options(
+            void_vault_options
+            INTERFACE 
+            -fsanitize-address,undefined
+            -fno-omit-frame-pointer
+        )
+
+        target_link_options(
+            void_vault_options
+            INTERFACE 
+            -fsanitize-address,undefined
+        )
+    
+    else()
+        message(FATAL_ERROR
+            "Requested sanitizer configuration is not "
+            "supported by this compiler/platform setup."
+        )
+    endif()
+endif()
