@@ -6,12 +6,15 @@ Authorizer::Authorizer()
 {
 }
 
+
 bool Authorizer::verifyPassword(
-	const std:: string& attempted_password
-)const{
-	return attempted_password == password;
-}
-bool Authorizer::isAuthorized() const
-{
+    const std::string& attempted_password
+) {
+    authorized = (attempted_password == password);
     return authorized;
 }
+
+bool Authorizer::isAuthorized() const {
+    return authorized;
+}
+

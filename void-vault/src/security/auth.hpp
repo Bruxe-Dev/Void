@@ -7,7 +7,7 @@ class Authorizer {
 public:
     Authorizer();
 
-	bool verifyPassword(const std::string& attempted_password) const;
+	bool verifyPassword(const std::string& attempted_password);
     bool isAuthorized() const;
 
 private:
