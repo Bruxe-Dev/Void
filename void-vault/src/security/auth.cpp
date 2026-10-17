@@ -18,3 +18,6 @@ bool Authorizer::isAuthorized() const {
     return authorized;
 }
 
+void Authorizer::revokeAuthorization(){
+	authprized = false;
+}
