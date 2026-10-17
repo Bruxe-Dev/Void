@@ -10,7 +10,7 @@ int main()
 
     std::cout << std::boolalpha;
 
-    std::cout << "=== Local Vault ===\n";
+    std::cout << "=== Void Vault ===\n";
 
     std::cout << "\n1. Initial state\n";
     std::cout << "Authorized: "
