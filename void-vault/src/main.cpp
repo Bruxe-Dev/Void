@@ -9,7 +9,7 @@ int main()
               << vault.isUnlocked();
 
     vault.lock();
-    std::cout << "After Lock(): "
+    std::cout << "\nAfter Lock(): "
               << vault.isUnlocked();
     return 0;
 }
