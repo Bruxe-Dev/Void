@@ -113,7 +113,9 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/src/main.cpp")
     )
 
     target_link_libraries(
-        PRIVATE void_vault_options
+        void_vault
+        PRIVATE 
+        void_vault_options
     )
 
     target_include_directories(
