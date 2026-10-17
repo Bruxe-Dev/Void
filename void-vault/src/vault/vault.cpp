@@ -20,5 +20,5 @@ bool Vault::unlock(){
 
 void Vault::lock(){
 	is_unlocked = false;
-	authorizer.revokeAuthorization()
+	authorizer.revokeAuthorization();
 }

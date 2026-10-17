@@ -19,5 +19,5 @@ bool Authorizer::isAuthorized() const {
 }
 
 void Authorizer::revokeAuthorization(){
-	authprized = false;
+	authorized = false;
 }
