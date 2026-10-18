@@ -67,9 +67,10 @@ int main()
 
     std::cout << "\n7. Testing five failed attempts\n";
 
+    authorizer.setPassword("void@2k26");
     for (int i = 1; i <= 5; i++)
     {
-        bool result = vault.authenticate("WrongPassword123!");
+        bool result = vault.authenticate("void@2k26");
 
         std::cout << "Attempt " << i
                   << ": " << (result ? "Success" : "Failed")
