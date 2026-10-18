@@ -65,5 +65,17 @@ int main()
     std::cout << "Authorized: "
               << authorizer.isAuthorized() << '\n';
 
+    std::cout << "\n7. Testing five failed attempts\n";
+
+    for (int i = 1; i <= 5; i++)
+    {
+        bool result = vault.authenticate("WrongPassword123!");
+
+        std::cout << "Attempt " << i
+                  << ": " << (result ? "Success" : "Failed")
+                  << " | Locked out: "
+                  << (authorizer.isLockedOut() ? "true" : "false")
+                  << '\n';
+    }
     return 0;
 }
