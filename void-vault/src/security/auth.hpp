@@ -7,14 +7,13 @@ class Authorizer {
 public:
     Authorizer();
 
-	bool verifyPassword(const std::string& attempted_password);
+    bool verifyPassword(const std::string& attempted_password);
     bool isAuthorized() const;
     void revokeAuthorization();
 
 private:
     bool authorized;
-    std::string password;
+    std::string password_hash;
 };
 
 #endif
-

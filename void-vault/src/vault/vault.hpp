@@ -2,6 +2,7 @@
 #ifndef VOID_VAULT_VAULT_HPP
 #define VOID_VAULT_VAULT_HPP
 
+#include <string>
 #include "../security/auth.hpp"
 
 class Vault {
