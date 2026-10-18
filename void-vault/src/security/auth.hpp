@@ -7,6 +7,7 @@ class Authorizer {
 public:
     Authorizer();
 
+    bool setPassword(const std::string& new_password);
     bool verifyPassword(const std::string& attempted_password);
     bool isAuthorized() const;
     void revokeAuthorization();
