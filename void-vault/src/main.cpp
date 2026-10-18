@@ -25,11 +25,11 @@ int main()
               << (vault.isUnlocked() ? "true" : "false")
               << '\n';
 
-    std::cout << "\n3. Authenticate with correct password\n";
+    std::cout << "\n3. Set and verify password\n";
 
     if (!authorizer.setPassword("PrototypePassword123!"))
     {
-        std::cerr << "Failed to set prototype password.\n";
+        std::cerr << "Password setup failed.\n";
         return 1;
     }
 
@@ -72,31 +72,35 @@ int main()
 
     std::cout << "\n7. Testing five failed attempts\n";
 
-    bool reset =
-        authorizer.setPassword("NewPrototypePassword123!");
-
-    std::cout << "Password reset: "
-              << (reset ? "true" : "false") << '\n';
-    std::cout << "Locked out after reset: "
+    std::cout << "Locked out before test: "
               << (authorizer.isLockedOut() ? "true" : "false")
               << '\n';
 
-    if (!reset || authorizer.isLockedOut())
-    {
-        std::cerr << "Could not reset authentication state.\n";
-        return 1;
-    }
-
-    for (int i = 1; i <= 5; ++i)
+    for (int i = 1; i <= 4; ++i)
     {
         bool result = vault.authenticate("WrongPassword123!");
 
-        std::cout << "Attempt " << i
+        std::cout << "Additional attempt " << i
                   << ": " << (result ? "Success" : "Failed")
                   << " | Locked out: "
                   << (authorizer.isLockedOut() ? "true" : "false")
                   << '\n';
     }
+
+    std::cout << "\nFinal lockout status: "
+              << (authorizer.isLockedOut() ? "true" : "false")
+              << '\n';
+
+    std::cout << "\n8. Testing password-reset protection\n";
+
+    bool reset =
+        authorizer.setPassword("AnotherPrototypePassword123!");
+
+    std::cout << "Second password setup accepted: "
+              << (reset ? "true" : "false") << '\n';
+    std::cout << "Still locked out: "
+              << (authorizer.isLockedOut() ? "true" : "false")
+              << '\n';
 
     std::cout << "\n=== End of tests ===\n";
 
