@@ -121,6 +121,7 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/src/main.cpp")
         void_vault
         PRIVATE 
         void_vault_options
+        PkConfig::SODIUM
     )
 
     target_include_directories(
