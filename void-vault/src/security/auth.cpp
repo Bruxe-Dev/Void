@@ -1,3 +1,4 @@
+
 #include "auth.hpp"
 
 #include <sodium.h>
@@ -6,7 +7,8 @@
 Authorizer::Authorizer()
     : authorized(false),
       failed_attempts(0),
-      locked_out(false)
+      locked_out(false),
+      password_initialized(false)
 {
     if (sodium_init() < 0) {
         throw std::runtime_error("Libsodium initialization failed");
@@ -14,6 +16,11 @@ Authorizer::Authorizer()
 }
 
 bool Authorizer::setPassword(const std::string& new_password) {
+    // Allow initial setup only.
+    if (password_initialized || locked_out) {
+        return false;
+    }
+
     if (new_password.size() < 12) {
         return false;
     }
@@ -31,9 +38,8 @@ bool Authorizer::setPassword(const std::string& new_password) {
     }
 
     password_hash = hash;
+    password_initialized = true;
     authorized = false;
-    failed_attempts = 0;
-    locked_out = false;
 
     return true;
 }
@@ -41,7 +47,7 @@ bool Authorizer::setPassword(const std::string& new_password) {
 bool Authorizer::verifyPassword(
     const std::string& attempted_password
 ) {
-    if (locked_out || password_hash.empty()) {
+    if (locked_out || !password_initialized || password_hash.empty()) {
         authorized = false;
         return false;
     }
@@ -77,3 +83,4 @@ void Authorizer::revokeAuthorization() {
 bool Authorizer::isLockedOut() const {
     return locked_out;
 }
+

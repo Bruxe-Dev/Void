@@ -18,6 +18,7 @@ private:
     std::string password_hash;
     int failed_attempts;
     bool locked_out;
+    bool password_initialized;
 };
 
 #endif
