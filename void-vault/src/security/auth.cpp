@@ -4,13 +4,14 @@
 #include <stdexcept>
 
 Authorizer::Authorizer()
-    : authorized(false)
+    : authorized(false),
+      failed_attempts(0),
+      locked_out(false)
 {
     if (sodium_init() < 0) {
         throw std::runtime_error("Libsodium initialization failed");
     }
 }
-
 
 bool Authorizer::setPassword(const std::string& new_password) {
     if (new_password.size() < 12) {
@@ -31,9 +32,11 @@ bool Authorizer::setPassword(const std::string& new_password) {
 
     password_hash = hash;
     authorized = false;
+    failed_attempts = 0;
+    locked_out = false;
+
     return true;
 }
-
 
 bool Authorizer::verifyPassword(
     const std::string& attempted_password
@@ -63,7 +66,6 @@ bool Authorizer::verifyPassword(
     return false;
 }
 
-
 bool Authorizer::isAuthorized() const {
     return authorized;
 }
@@ -72,3 +74,6 @@ void Authorizer::revokeAuthorization() {
     authorized = false;
 }
 
+bool Authorizer::isLockedOut() const {
+    return locked_out;
+}
