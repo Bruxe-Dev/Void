@@ -12,6 +12,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 find_package(Threads REQUIRED)
+find_package(PkgConfig REQUIRED)
+
+pkg_check_modules(SODIUM REQUIRED IMPORTED_TARGET libsodium)
 
 option(
     VOID_VAULT_BUILD_TESTS
