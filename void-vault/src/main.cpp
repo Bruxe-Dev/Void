@@ -8,6 +8,11 @@ int main()
     Authorizer authorizer;
     Vault vault(authorizer);
 
+    if (!authorizer.setPassword("prototype-password"))
+    {
+        std::cerr << "Password setup failed\n";
+        return 1;
+    }
     std::cout << std::boolalpha;
 
     std::cout << "=== Void Vault ===\n";

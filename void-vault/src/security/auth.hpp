@@ -11,10 +11,14 @@ public:
     bool verifyPassword(const std::string& attempted_password);
     bool isAuthorized() const;
     void revokeAuthorization();
+    bool isLockedOut() const;
 
 private:
     bool authorized;
     std::string password_hash;
+    int failed_attempts;
+    bool locked_out;
 };
 
 #endif
+

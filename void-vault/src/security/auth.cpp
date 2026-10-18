@@ -11,8 +11,9 @@ Authorizer::Authorizer()
     }
 }
 
+
 bool Authorizer::setPassword(const std::string& new_password) {
-    if (new_password.empty()) {
+    if (new_password.size() < 12) {
         return false;
     }
 
@@ -33,24 +34,35 @@ bool Authorizer::setPassword(const std::string& new_password) {
     return true;
 }
 
+
 bool Authorizer::verifyPassword(
     const std::string& attempted_password
 ) {
-    if (password_hash.empty()) {
+    if (locked_out || password_hash.empty()) {
         authorized = false;
         return false;
     }
 
-    authorized = (
-        crypto_pwhash_str_verify(
+    if (crypto_pwhash_str_verify(
             password_hash.c_str(),
             attempted_password.c_str(),
             attempted_password.size()
-        ) == 0
-    );
+        ) == 0) {
+        failed_attempts = 0;
+        authorized = true;
+        return true;
+    }
 
-    return authorized;
+    authorized = false;
+    ++failed_attempts;
+
+    if (failed_attempts >= 5) {
+        locked_out = true;
+    }
+
+    return false;
 }
+
 
 bool Authorizer::isAuthorized() const {
     return authorized;
