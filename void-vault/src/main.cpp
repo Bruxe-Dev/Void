@@ -1,7 +1,7 @@
 #include <iostream>
 #include "security/auth.hpp"
 #include "vault/vault.hpp"
-#include "storage.cpp"
+#include "storage.hpp"
 
 int main()
 {
