@@ -1,11 +1,20 @@
 #include "../src/vault/vault.hpp"
 
-#include <cassert>
+#include <cstdlib>
 #include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <iterator>
 #include <string>
+
+void check(bool condition, const char *message)
+{
+    if (!condition)
+    {
+        std::cerr << "FAILED: " << message << '\n';
+        std::exit(EXIT_FAILURE);
+    }
+}
 
 int main()
 {
@@ -19,43 +28,47 @@ int main()
     Storage storage(test_file);
     Vault vault(authorizer, storage);
 
-    assert(authorizer.setPassword(password));
+    check(
+        authorizer.setPassword(password),
+        "Password setup");
 
-    assert(!vault.isUnlocked());
-    assert(!vault.saveData(original));
+    check(!vault.isUnlocked(), "Vault starts locked");
+    check(!vault.saveData(original), "Saving while locked is rejected");
 
     std::string loaded;
-    assert(!vault.loadData(loaded));
+    check(!vault.loadData(loaded), "Loading while locked is rejected");
 
-    assert(vault.authenticate(password));
-    assert(vault.unlock());
-    assert(vault.isUnlocked());
+    check(vault.authenticate(password), "Correct password authenticates");
+    check(vault.unlock(), "Authenticated vault unlocks");
+    check(vault.isUnlocked(), "Vault reports unlocked");
 
-    assert(vault.saveData(original));
+    check(vault.saveData(original), "Saving encrypted data succeeds");
 
     std::ifstream file(test_file, std::ios::binary);
-    assert(file.is_open());
+    check(file.is_open(), "Encrypted file exists and opens");
 
-    std::string disk_data{
+    const std::string disk_data{
         std::istreambuf_iterator<char>(file),
         std::istreambuf_iterator<char>()};
 
     file.close();
 
-    assert(!disk_data.empty());
-    assert(disk_data.find(original) == std::string::npos);
+    check(!disk_data.empty(), "Encrypted file is not empty");
+    check(
+        disk_data.find(original) == std::string::npos,
+        "Plaintext is absent from encrypted file");
 
-    assert(vault.loadData(loaded));
-    assert(loaded == original);
+    check(vault.loadData(loaded), "Loading encrypted data succeeds");
+    check(loaded == original, "Loaded data matches original");
 
     vault.lock();
 
-    assert(!vault.isUnlocked());
-    assert(!vault.saveData(original));
-    assert(!vault.loadData(loaded));
+    check(!vault.isUnlocked(), "Vault locks successfully");
+    check(!vault.saveData(original), "Saving after locking is rejected");
+    check(!vault.loadData(loaded), "Loading after locking is rejected");
 
-    assert(vault.authenticate(password));
-    assert(vault.unlock());
+    check(vault.authenticate(password), "Re-authentication succeeds");
+    check(vault.unlock(), "Vault unlocks again");
 
     std::string corrupted = disk_data;
     corrupted.back() ^= 1;
@@ -65,20 +78,28 @@ int main()
             test_file,
             std::ios::binary | std::ios::trunc);
 
-        assert(output.is_open());
+        check(output.is_open(), "Corrupted file opens for writing");
+
         output.write(
             corrupted.data(),
             static_cast<std::streamsize>(corrupted.size()));
 
-        assert(output.good());
+        check(output.good(), "Corrupted data is written");
     }
 
-    assert(!vault.loadData(loaded));
+    const std::string previous_loaded = loaded;
 
-    // 9. Clean up
+    check(
+        !vault.loadData(loaded),
+        "Corrupted ciphertext is rejected");
+
+    check(
+        loaded == previous_loaded,
+        "Failed decryption does not overwrite output data");
+
     vault.lock();
     std::remove(test_file.c_str());
 
     std::cout << "All vault integration tests passed.\n";
-    return 0;
+    return EXIT_SUCCESS;
 }
