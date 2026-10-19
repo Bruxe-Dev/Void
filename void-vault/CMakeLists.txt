@@ -115,6 +115,7 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/src/main.cpp")
         src/main.cpp
         src/vault/vault.cpp
         src/security/auth.cpp
+        src/security/encryption.cpp
         src/storage/storage.cpp
     )
 
