@@ -21,6 +21,17 @@ int main()
         std::cerr << "FAIL: Password setup\n";
         return 1;
     }
+    const bool short_password_result =
+        authorizer.setPassword("short");
 
+    if (!short_password_result)
+    {
+        std::cout << "PASS: Reject short password\n";
+    }
+    else
+    {
+        std::cerr << "FAIL: Accepted short password\n";
+        return 1;
+    }
     return 0;
 }

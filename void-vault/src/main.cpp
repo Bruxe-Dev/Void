@@ -2,6 +2,7 @@
 #include "security/auth.hpp"
 #include "vault/vault.hpp"
 #include "storage.hpp"
+#include <string>
 
 int main()
 {
@@ -49,7 +50,35 @@ int main()
     std::cout << "Vault unlocked: "
               << (vault.isUnlocked() ? "true" : "false") << '\n';
 
-    std::cout << "\n5. Attempt incorrect password\n";
+    std::cout << "\n5. Saving prototype data\n";
+
+    Storage storage("vault_data.dat");
+
+    const std::string sample_data =
+        "Void Vault prototype data";
+
+    if (vault.isUnlocked() && storage.save(sample_data))
+    {
+        std::cout << "Data saved successfully.\n";
+    }
+    else
+    {
+        std::cerr << "Data save failed or vault is locked.\n";
+    }
+    std::cout << "\nLoading prototype data\n";
+
+    std::string loaded_data;
+
+    if (vault.isUnlocked() && storage.load(loaded_data))
+    {
+        std::cout << "Loaded data: "
+                  << loaded_data << '\n';
+    }
+    else
+    {
+        std::cerr << "Data load failed or vault is locked.\n";
+    }
+    std::cout << "\n6. Attempt incorrect password\n";
 
     bool wrong_auth =
         vault.authenticate("DefinitelyWrongPassword!");
@@ -62,7 +91,7 @@ int main()
     std::cout << "Vault unlocked: "
               << (vault.isUnlocked() ? "true" : "false") << '\n';
 
-    std::cout << "\n6. Lock the vault\n";
+    std::cout << "\n7. Lock the vault\n";
     vault.lock();
 
     std::cout << "Vault unlocked: "
@@ -71,7 +100,7 @@ int main()
               << (authorizer.isAuthorized() ? "true" : "false")
               << '\n';
 
-    std::cout << "\n7. Testing five failed attempts\n";
+    std::cout << "\n8. Testing five failed attempts\n";
 
     std::cout << "Locked out before test: "
               << (authorizer.isLockedOut() ? "true" : "false")
@@ -92,7 +121,7 @@ int main()
               << (authorizer.isLockedOut() ? "true" : "false")
               << '\n';
 
-    std::cout << "\n8. Testing password-reset protection\n";
+    std::cout << "\n9. Testing password-reset protection\n";
 
     bool reset =
         authorizer.setPassword("AnotherPrototypePassword123!");
