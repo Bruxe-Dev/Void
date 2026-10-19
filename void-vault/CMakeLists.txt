@@ -142,7 +142,7 @@ endif()
 if(VOID_VAULT_BUILD_TESTS)
     enable_testing()
 
-    if(EXISTS "${PROJECT_SOURCE_DIR/tests/CMakeLists.txt}")
+    if(EXISTS "${PROJECT_SOURCE_DIR}/tests/CMakeLists.txt")
         add_subdirectory(tests)
     else()
         message(STATUS
