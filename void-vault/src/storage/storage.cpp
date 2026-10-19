@@ -2,8 +2,8 @@
 
 #include <fstream>
 
-Storage::Storage(const std::string &file_path)
-    : file_path(file_path)
+Storage::Storage(const std::string& path)
+    : file_path(path)
 {
 }
 

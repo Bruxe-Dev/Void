@@ -128,7 +128,7 @@ if(EXISTS "${PROJECT_SOURCE_DIR}/src/main.cpp")
     target_include_directories(
         void_vault
         PRIVATE 
-        "s{PROJECT_SOURCE_DIR}/include"
+        "${PROJECT_SOURCE_DIR}/include"
     )
 
 else()
