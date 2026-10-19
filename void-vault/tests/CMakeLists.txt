@@ -39,3 +39,25 @@ add_test(
 	NAME auth_test
 	COMMAND auth_test
 )
+
+add_executable(encryption_test
+    encryption_test.cpp
+    ../src/security/encryption.cpp
+)
+
+target_link_libraries(
+    encryption_test
+    PRIVATE
+    void_vault_options
+    PkgConfig::SODIUM
+)
+
+target_include_directories(
+    encryption_test
+    PRIVATE "${PROJECT_SOURCE_DIR}/include"
+)
+
+add_test(
+    NAME encryption_test
+    COMMAND encryption_test
+)
