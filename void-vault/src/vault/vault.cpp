@@ -1,7 +1,8 @@
 #include "vault.hpp"
 
-Vault::Vault(Authorizer& authorizer_ref)
+Vault::Vault(Authorizer& authorizer_ref, Storage& storage_ref)
     : authorizer(authorizer_ref),
+      storage(storage_ref),
       is_unlocked(false)
 {
 }
@@ -34,3 +35,18 @@ void Vault::lock() {
     authorizer.revokeAuthorization();
 }
 
+bool Vault::saveData(const std::string& data) {
+    if (!is_unlocked) {
+        return false;
+    }
+
+    return storage.save(data);
+}
+
+bool Vault::loadData(std::string& data) {
+    if (!is_unlocked) {
+        return false;
+    }
+
+    return storage.load(data);
+}

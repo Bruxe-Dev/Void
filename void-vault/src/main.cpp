@@ -9,7 +9,8 @@ int main()
     std::cout << "=== Void Vault ===\n";
 
     Authorizer authorizer;
-    Vault vault(authorizer);
+    Storage storage("vault_data.dat");
+    Vault vault(authorizer, storage);
 
     std::cout << "\n1. Initial state\n";
     std::cout << "Authorized: "
@@ -52,12 +53,10 @@ int main()
 
     std::cout << "\n5. Saving prototype data\n";
 
-    Storage storage("vault_data.dat");
-
     const std::string sample_data =
         "Void Vault prototype data";
 
-    if (vault.isUnlocked() && storage.save(sample_data))
+    if (vault.saveData(sample_data))
     {
         std::cout << "Data saved successfully.\n";
     }
@@ -65,11 +64,12 @@ int main()
     {
         std::cerr << "Data save failed or vault is locked.\n";
     }
+
     std::cout << "\nLoading prototype data\n";
 
     std::string loaded_data;
 
-    if (vault.isUnlocked() && storage.load(loaded_data))
+    if (vault.loadData(loaded_data))
     {
         std::cout << "Loaded data: "
                   << loaded_data << '\n';

@@ -1,23 +1,27 @@
-
 #ifndef VOID_VAULT_VAULT_HPP
 #define VOID_VAULT_VAULT_HPP
 
 #include <string>
+
 #include "../security/auth.hpp"
+#include "../../include/storage.hpp"
 
 class Vault {
 public:
-    explicit Vault(Authorizer& authorizer);
+    Vault(Authorizer& authorizer, Storage& storage);
 
     bool isUnlocked() const;
     bool authenticate(const std::string& attempted_password);
     bool unlock();
     void lock();
 
+    bool saveData(const std::string& data);
+    bool loadData(std::string& data);
+
 private:
     Authorizer& authorizer;
+    Storage& storage;
     bool is_unlocked;
 };
 
 #endif
-
