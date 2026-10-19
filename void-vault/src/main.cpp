@@ -8,7 +8,7 @@ int main()
 {
     std::cout << "=== Void Vault ===\n";
 
-    Authorizer authorizer;
+    Authorizer authorizer("vault_auth.dat");
     Storage storage("vault_data.dat");
     Vault vault(authorizer, storage);
 
