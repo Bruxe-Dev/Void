@@ -1,0 +1,220 @@
+Start testing: Oct 20 21:11 South Africa Standard Time
+----------------------------------------------------------
+1/5 Testing: storage_test
+1/5 Test: storage_test
+Command: "D:/Void/void-vault/build-debug/tests/storage_test.exe"
+Directory: D:/Void/void-vault/build-debug/tests
+"storage_test" start time: Oct 20 21:11 South Africa Standard Time
+Output:
+----------------------------------------------------------
+=== Storage Tests ===
+PASS: File absent initially
+PASS: Loading a missing file fails
+PASS: Failed load leaves output untouched
+PASS: Save data
+PASS: File exists after save
+PASS: Load returns saved content
+PASS: Overwrite save succeeds
+PASS: Atomic overwrite replaced content
+PASS: No temp file left behind
+PASS: Binary data with NULs round-trips
+PASS: Empty data round-trips
+PASS: Save into nonexistent directory fails
+PASS: Failed save creates no files
+PASS: allow_replace=false creates new file
+PASS: allow_replace=false refuses to overwrite
+PASS: Existing file preserved
+PASS: No temp file after refused write
+All storage tests passed.
+<end of output>
+Test time =   0.47 sec
+----------------------------------------------------------
+Test Passed.
+"storage_test" end time: Oct 20 21:11 South Africa Standard Time
+"storage_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+2/5 Testing: auth_test
+2/5 Test: auth_test
+Command: "D:/Void/void-vault/build-debug/tests/auth_test.exe"
+Directory: D:/Void/void-vault/build-debug/tests
+"auth_test" start time: Oct 20 21:11 South Africa Standard Time
+Output:
+----------------------------------------------------------
+=== Authentication Tests ===
+PASS: Password setup
+PASS: Second setup rejected
+PASS: Correct password accepted
+PASS: Reject short password
+PASS: Short password leaves account uninitialized
+PASS: Missing file is not an error
+PASS: Missing file means uninitialized
+PASS: Verify before setup fails
+PASS: Persistent setup succeeds
+PASS: Plaintext password absent from auth file
+PASS: Auth file uses VVAUTH1 format
+PASS: No temp file after setup
+PASS: Account loads after restart
+PASS: Existing account cannot be overwritten
+PASS: Not authorized right after construction
+PASS: Correct password accepted after restart
+PASS: Authorized after correct password
+PASS: Counter is 0 after success
+PASS: Wrong password rejected
+PASS: Failed attempt leaves unauthorized
+PASS: Failed attempt counted
+PASS: Failed counter persisted across restart
+PASS: Correct password before lockout succeeds
+PASS: Success resets counter
+PASS: Counter reset persisted
+PASS: Locked out after 5 failures
+PASS: Correct password rejected while locked out
+PASS: Lockout persists across restart
+PASS: Correct password still rejected after restart
+PASS: Malformed auth record -> storage error
+PASS: Malformed record not replaced by a new account
+PASS: Malformed record cannot authenticate
+PASS: Malformed record left untouched
+PASS: Malformed auth record -> storage error
+PASS: Malformed record not replaced by a new account
+PASS: Malformed record cannot authenticate
+PASS: Malformed record left untouched
+PASS: Malformed auth record -> storage error
+PASS: Malformed record not replaced by a new account
+PASS: Malformed record cannot authenticate
+PASS: Malformed record left untouched
+PASS: Malformed auth record -> storage error
+PASS: Malformed record not replaced by a new account
+PASS: Malformed record cannot authenticate
+PASS: Malformed record left untouched
+PASS: Malformed auth record -> storage error
+PASS: Malformed record not replaced by a new account
+PASS: Malformed record cannot authenticate
+PASS: Malformed record left untouched
+PASS: Malformed auth record -> storage error
+PASS: Malformed record not replaced by a new account
+PASS: Malformed record cannot authenticate
+PASS: Malformed record left untouched
+PASS: Non-numeric counter -> storage error
+PASS: Setup for legacy test
+PASS: Legacy single-line hash accepted
+PASS: Legacy account authenticates
+PASS: Legacy file upgraded to VVAUTH1
+PASS: Missing parent dir: treated as no account
+PASS: Setup fails when the file cannot be written
+PASS: Failed setup leaves account uninitialized
+All auth tests passed.
+<end of output>
+Test time =   2.54 sec
+----------------------------------------------------------
+Test Passed.
+"auth_test" end time: Oct 20 21:11 South Africa Standard Time
+"auth_test" time elapsed: 00:00:02
+----------------------------------------------------------
+
+3/5 Testing: encryption_test
+3/5 Test: encryption_test
+Command: "D:/Void/void-vault/build-debug/tests/encryption_test.exe"
+Directory: D:/Void/void-vault/build-debug/tests
+"encryption_test" start time: Oct 20 21:11 South Africa Standard Time
+Output:
+----------------------------------------------------------
+=== Encryption Tests ===
+PASS: Encrypt succeeds
+PASS: Record size = header + MAC + plaintext
+PASS: Ciphertext does not contain plaintext
+PASS: Round trip
+PASS: Two encryptions differ (random salt/nonce)
+PASS: Wrong password rejected
+PASS: Failed decrypt leaves output unchanged
+PASS: Tampering anywhere (magic/salt/nonce/MAC/ciphertext) rejected
+PASS: Truncated records rejected
+PASS: Appended bytes rejected
+PASS: Header-only record rejected
+PASS: Wrong magic rejected
+PASS: Empty password rejected for encrypt
+PASS: Empty password rejected for decrypt
+PASS: Empty plaintext round trip
+PASS: Binary plaintext with NULs round trip
+PASS: 1 MiB plaintext round trip
+PASS: UTF-8 password round trip
+All encryption tests passed.
+<end of output>
+Test time =   3.58 sec
+----------------------------------------------------------
+Test Passed.
+"encryption_test" end time: Oct 20 21:11 South Africa Standard Time
+"encryption_test" time elapsed: 00:00:03
+----------------------------------------------------------
+
+4/5 Testing: vault_test
+4/5 Test: vault_test
+Command: "D:/Void/void-vault/build-debug/tests/vault_test.exe"
+Directory: D:/Void/void-vault/build-debug/tests
+"vault_test" start time: Oct 20 21:11 South Africa Standard Time
+Output:
+----------------------------------------------------------
+=== Vault Integration Tests ===
+PASS: Password setup
+PASS: Vault starts locked
+PASS: Unlock without authentication rejected
+PASS: Saving while locked is rejected
+PASS: Locked error reported
+PASS: Loading while locked is rejected
+PASS: Wrong password fails
+PASS: Failed authentication leaves vault locked
+PASS: Correct password authenticates
+PASS: Authenticated vault unlocks
+PASS: Vault reports unlocked
+PASS: NoData before first save
+PASS: Saving encrypted data succeeds
+PASS: Encrypted file is not empty
+PASS: Plaintext is absent from encrypted file
+PASS: Loaded data matches original
+PASS: Lock is idempotent and revokes authorization
+PASS: Saving after locking is rejected
+PASS: Loading after locking is rejected
+PASS: Re-authentication succeeds
+PASS: Vault unlocks again
+PASS: Saving empty data succeeds
+PASS: Empty data loads
+PASS: Restore original data
+PASS: Corrupted ciphertext is rejected
+PASS: DecryptFailed reported
+PASS: Failed decryption does not overwrite output data
+PASS: Refuses to overwrite undecryptable data
+PASS: ForeignDataExists reported
+PASS: Undecryptable data file preserved
+PASS: Unlock after restart
+PASS: Data persists across restart
+PASS: Second account setup
+PASS: Second account unlocks
+PASS: Other password cannot read data
+PASS: Other password cannot overwrite data
+PASS: Original data intact
+All vault tests passed.
+<end of output>
+Test time =   3.21 sec
+----------------------------------------------------------
+Test Passed.
+"vault_test" end time: Oct 20 21:11 South Africa Standard Time
+"vault_test" time elapsed: 00:00:03
+----------------------------------------------------------
+
+5/5 Testing: app_e2e_test
+5/5 Test: app_e2e_test
+Command: "C:/Program Files/CMake/bin/cmake.exe" "-DAPP=D:/Void/void-vault/build-debug/void_vault.exe" "-DWORK_DIR=D:/Void/void-vault/build-debug/tests/e2e_data" "-P" "D:/Void/void-vault/tests/app_e2e_test.cmake"
+Directory: D:/Void/void-vault/build-debug/tests
+"app_e2e_test" start time: Oct 20 21:11 South Africa Standard Time
+Output:
+----------------------------------------------------------
+-- app_e2e_test passed
+<end of output>
+Test time =   3.49 sec
+----------------------------------------------------------
+Test Passed.
+"app_e2e_test" end time: Oct 20 21:11 South Africa Standard Time
+"app_e2e_test" time elapsed: 00:00:03
+----------------------------------------------------------
+
+End testing: Oct 20 21:11 South Africa Standard Time

@@ -236,13 +236,16 @@ def floor_to_step(volume: float, step: float) -> float:
     if not (math.isfinite(volume) and volume > 0 and step > 0):
         return 0.0
     d_step = Decimal(str(step))
-    units = (Decimal(str(volume)) / d_step).to_integral_value(rounding=ROUND_FLOOR)
+    # Add 1e-12 relative tolerance so IEEE-754 representation noise (e.g. 0.99999999999988)
+    # on an exact division does not drop a full step, while still strictly flooring.
+    d_vol = Decimal(f"{volume * (1.0 + 1e-12):.12g}")
+    units = (d_vol / d_step).to_integral_value(rounding=ROUND_FLOOR)
     return float(units * d_step)
 
 
 def loss_per_lot_from_ticks(spec: InstrumentSpec, entry: float, sl: float) -> float:
     """Monetary loss for 1.0 lot moving from entry to SL, using tick size / tick value."""
-    ticks = abs(entry - sl) / spec.tick_size
+    ticks = round(abs(entry - sl) / spec.tick_size, 6)
     return ticks * spec.tick_value_loss
 
 

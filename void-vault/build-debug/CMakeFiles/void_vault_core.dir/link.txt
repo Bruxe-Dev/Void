@@ -1,0 +1,2 @@
+C:\msys64\ucrt64\bin\ar.exe qc libvoid_vault_core.a CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.obj CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj
+C:\msys64\ucrt64\bin\ranlib.exe libvoid_vault_core.a

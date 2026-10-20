@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\vault_test.dir/objects.a
+C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\vault_test.dir/objects.a @CMakeFiles\vault_test.dir\objects1.rsp
+C:\msys64\ucrt64\bin\c++.exe -g -static -Wl,--whole-archive CMakeFiles\vault_test.dir/objects.a -Wl,--no-whole-archive -o vault_test.exe -Wl,--out-implib,libvault_test.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\vault_test.dir\linkLibs.rsp

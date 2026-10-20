@@ -1,0 +1,3 @@
+"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\void_vault.dir/objects.a
+C:\msys64\ucrt64\bin\ar.exe qc CMakeFiles\void_vault.dir/objects.a @CMakeFiles\void_vault.dir\objects1.rsp
+C:\msys64\ucrt64\bin\c++.exe -g -static -Wl,--whole-archive CMakeFiles\void_vault.dir/objects.a -Wl,--no-whole-archive -o void_vault.exe -Wl,--out-implib,libvoid_vault.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\void_vault.dir\linkLibs.rsp
