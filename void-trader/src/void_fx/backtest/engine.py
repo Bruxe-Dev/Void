@@ -439,7 +439,15 @@ def run_backtest(
             spread_points=float(spread_pts[i]),
         )
         if not decision.approved or decision.sizing is None:
-            reason_key = decision.reasons[0].split("(")[0].strip() if decision.reasons else "unknown"
+            raw_r = decision.reasons[0] if decision.reasons else "unknown"
+            if raw_r.startswith("minimum volume") and "would risk" in raw_r:
+                reason_key = "minimum_volume_exceeds_risk_budget"
+            elif raw_r.startswith("minimum volume") and "needs margin" in raw_r:
+                reason_key = "minimum_volume_exceeds_margin_limit"
+            elif raw_r.startswith("trading halted:"):
+                reason_key = "halted_max_drawdown"
+            else:
+                reason_key = raw_r.split("(")[0].strip()
             rejections[reason_key] += 1
             continue
 

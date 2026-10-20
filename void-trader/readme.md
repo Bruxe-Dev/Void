@@ -1,50 +1,88 @@
-# Void FX: Hierarchical Stacked-Ensemble Algorithmic Forex Trading
+# Void FX (Void Trader): Hierarchical Stacked-Ensemble Algorithmic Forex Trading
 
-Fully automated algorithmic Forex trading robot interfacing with MetaTrader 5 (MT5) on H1 candle frequency targeting **EURUSD** and **GBPUSD**.
+Automated H1 Forex prediction and trading system interfacing with MetaTrader 5 (MT5) targeting **EURUSD** and **GBPUSD**, with mandatory account-size-aware risk management and a pre-submission `OrderGate`.
 
 ---
 
-## Architecture Overview
+## 1. Architecture Overview
 
 1. **Data & Features Engine (`src/void_fx/features/`):**
-   - Stationarity via log returns.
-   - Rolling 14-period Average True Range (ATR).
-   - 24-hour cyclical time encodings ($\sin/\cos$).
-   - Symmetrical vs. antisymmetrical feature transforms with mirror augmentation.
-   - Wilder's Average Directional Index (ADX) & Rolling Hurst Exponent regime metrics.
+   - Causal, look-ahead-free H1 feature engineering (`build_cascade_features` for v2 Cascade; `prepare_live_features` for v1 Legacy).
+   - Antisymmetric (`ret_1`, `ret_4`, `ret_24`, `di_spread`, `range_pos_24`) and symmetric (`adx_n`, `hurst`, `log_atr_pct`, `atr_ratio`, `hour_sin`, `hour_cos`) decomposition enabling exact chart-inversion mirror augmentation.
+   - Wilder's Average Directional Index (ADX) with Schmitt-trigger hysteresis and Rolling Hurst Exponent regime diagnostics (`src/void_fx/features/regime.py`).
 
-2. **Bidirectional Cascade Alpha Engine (`src/void_fx/labeling/cascade.py` & `models/cascade/`):**
-   - **Stage 1 (Direction Discovery):** XGBoost + PyTorch LSTM trained on symmetric ($\pm 1.0 \times \text{ATR}$) barriers with mirror data augmentation (balanced 50% Long / 50% Short).
-   - **Stage 2 (Meta-Manager Risk Gate):** Logistic Regression evaluating the 2:1 asymmetric reward:risk bracket ($\text{TP}=+2.0\text{ATR}, \text{SL}=-1.0\text{ATR}$) in the proposed direction. Only permits trade execution if expansion probability exceeds the breakeven threshold.
+2. **Bidirectional Cascade Alpha Engine (`models/cascade/` — Current H1 Baseline):**
+   - **Stage 1 (Direction Discovery):** XGBoost (`xgb_dir.pkl`) + 2-layer PyTorch LSTM (`lstm_dir.pth`) trained on symmetric $\pm 1.0 \times \text{ATR}(14)$ barriers over 24 H1 bars with mirror augmentation and Lopez de Prado average uniqueness sample weights.
+   - **Stage 2 (Meta-Manager Risk Gate):** Logistic Regression (`meta_gate.pkl`) evaluating whether a 2:1 reward:risk bracket ($\text{TP}=+2.0\text{ATR}, \text{SL}=-1.0\text{ATR}$) in the proposed direction reaches expansion TP before SL/expiry.
 
-3. **Execution & Risk Shield (`src/void_fx/live/cascade_runner.py`):**
-   - Hourly cycle operating on strictly closed bars (`df.iloc[:-1]`).
-   - Dynamic lot sizing budgeting strict 1% account equity risk.
-   - Bidirectional execution:
-     - **BUY:** Enters at Ask, Stop Loss below ($\text{Ask} - 1.0\text{ATR}$), Take Profit above ($\text{Ask} + 2.0\text{ATR}$).
-     - **SELL:** Enters at Bid, Stop Loss above ($\text{Bid} + 1.0\text{ATR}$), Take Profit below ($\text{Bid} - 2.0\text{ATR}$).
-   - Spread Shield: Automatically aborts execution if spread widens beyond 2.5 pips.
+3. **Centralized Risk Manager & Pre-Submission Order Gate (`src/void_fx/execution/`):**
+   - `risk_manager.py`: Broker-agnostic, account-size-aware sizing and hard risk validation. Sizes every trade from `min(balance, equity)`, floors volume strictly **down** to `volume_step`, and **skips** trades when `volume_min` would exceed the per-trade risk budget or margin cap (never rounds up).
+   - `mt5_gateway.py`: Read-only adapter pulling authoritative live account state, contract specs, tick values, margin requirements (`order_calc_margin`), stop-loss monetary risk (`order_calc_profit`), open positions/pending orders, and daily deal history.
+   - `order_gate.py`: Single order-submission boundary enforcing demo-only protection (`ALLOW_LIVE_TRADING=False`), emergency stop file (`STOP_TRADING`), per-trade risk (1%), max open risk (2%), max daily loss (3% reset at 00:00 UTC), max drawdown halt (10% persistent in `state/risk_state.json`), max margin utilization (30%), max concurrent positions (2 total / 1 per symbol), max consecutive losses (4/day), and per-bar idempotency.
+
+4. **Account-Aware Backtester (`src/void_fx/backtest/engine.py`):**
+   - Simulates H1 execution across arbitrary starting balances (`$50`, `$100`, `$500`, `$100,000`) using the exact same `validate_order` and `size_position` rules as live execution, accounting for spread, commission, slippage, swap, unrealized P&L, and margin.
 
 ---
 
-## Quickstart & Commands
+## 2. Environment Setup & Dependency Installation
 
-### 1. Run Automated Test Suite
+All commands assume working directory `D:\Void\void-trader` and the Conda environment `C:\Users\HP\anaconda3\envs\void\python.exe`.
+
 ```powershell
-pytest tests/test_cascade.py
+# Verify Python environment and packages
+C:\Users\HP\anaconda3\envs\void\python.exe -m pip install -r requirements.txt
+C:\Users\HP\anaconda3\envs\void\python.exe -m pip install -e . --no-build-isolation --no-deps
 ```
 
-### 2. Retrain Bidirectional Cascade Models
+---
+
+## 3. Verified Operating Commands
+
+### 1. Run Full Automated Test Suite (Unit, Risk Manager, Backtester & Model Smoke Tests)
 ```powershell
-python scripts/train_cascade.py
+C:\Users\HP\anaconda3\envs\void\python.exe -m pytest tests -v -p no:cacheprovider
 ```
 
-### 3. Run the Live Trading Robot (New Bidirectional Cascade Engine)
+### 2. Run Reproducible H1 Baseline Evaluation, Account-Size Scenarios ($50/$100/$500/$100k) & Experiments
 ```powershell
-python -u scripts/live_cascade_expert.py | Tee-Object -FilePath "trading_logs.txt"
+C:\Users\HP\anaconda3\envs\void\python.exe scripts/evaluate_h1_baseline.py
 ```
 
-### 4. Run Legacy Bot (Original Long-Only Prototype Fallback)
+### 3. Dry-Run One Live Cycle (Validates MT5 Connection, Inference & Risk Gate Without Sending Orders)
 ```powershell
-python -u scripts/live_forex_expert.py | Tee-Object -FilePath "legacy_trading_logs.txt"
+C:\Users\HP\anaconda3\envs\void\python.exe -u scripts/live_cascade_expert.py --dry-run --once
 ```
+
+### 4. Run Live Demo Trading Bot (Bidirectional Cascade H1 Baseline)
+```powershell
+C:\Users\HP\anaconda3\envs\void\python.exe -u scripts/live_cascade_expert.py | Tee-Object -FilePath "trading_logs.txt" -Append
+```
+
+### 5. Run Legacy v1 Demo Bot (Long-Only Fallback, Protected by OrderGate)
+```powershell
+C:\Users\HP\anaconda3\envs\void\python.exe -u scripts/live_forex_expert.py --dry-run --once
+```
+
+### 6. Train a Separate Candidate Model (Preserves `models/cascade/` Baseline Checkpoint)
+```powershell
+# Writes candidate artifacts to models/cascade_candidate/ (never overwrites models/cascade/ unless --overwrite-baseline is passed)
+C:\Users\HP\anaconda3\envs\void\python.exe scripts/train_cascade.py --output-dir models/cascade_candidate
+```
+
+### 7. Calibrate Regime Filter Thresholds (Read-Only)
+```powershell
+C:\Users\HP\anaconda3\envs\void\python.exe scripts/calibrate_regime.py
+```
+
+---
+
+## 4. Safe Shutdown & Emergency Controls
+
+- **Normal Shutdown:** Press `Ctrl+C` in the terminal running `live_cascade_expert.py`. The runner catches `KeyboardInterrupt`, calls `mt5.shutdown()`, and exits cleanly. Existing broker-side SL/TP brackets remain active on the MT5 server.
+- **Immediate Emergency Halt (No Process Restart Required):** Create the file `D:\Void\void-trader\STOP_TRADING`:
+  ```powershell
+  New-Item -ItemType File -Path D:\Void\void-trader\STOP_TRADING -Force
+  ```
+  `OrderGate` checks for `STOP_TRADING` before every submission and immediately rejects new orders while leaving existing positions intact.
+- **Resetting a Max-Drawdown Halt:** If equity drops $\ge 10\%$ below high-water mark, `state/risk_state.json` records `"halted": true`. Inspect the account, then edit or remove `state/risk_state.json` to resume demo testing.
