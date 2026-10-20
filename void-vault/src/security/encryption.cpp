@@ -1,6 +1,7 @@
 #include "encryption.hpp"
 
 #include <sodium.h>
+#include <algorithm>
 #include <stdexcept>
 #include <string>
 

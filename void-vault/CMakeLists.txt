@@ -37,7 +37,7 @@ target_compile_features(
 
 if(MSVC)
     target_compile_options(void_vault_options INTERFACE 
-        /w4
+        /W4
         /permissive-
         /sdl
         /GS
@@ -81,7 +81,7 @@ elseif(UNIX AND NOT APPLE)
         target_link_options(
             void_vault_options
             INTERFACE
-            -wl,-z,relro,-z,now
+            -Wl,-z,relro,-z,now
         )
     endif()
 endif()
@@ -92,14 +92,14 @@ if(VOID_VAULT_ENABLE_SANITIZERS)
         target_compile_options(
             void_vault_options
             INTERFACE 
-            -fsanitize-address,undefined
+            -fsanitize=address,undefined
             -fno-omit-frame-pointer
         )
 
         target_link_options(
             void_vault_options
             INTERFACE 
-            -fsanitize-address,undefined
+            -fsanitize=address,undefined
         )
     
     else()
@@ -110,36 +110,46 @@ if(VOID_VAULT_ENABLE_SANITIZERS)
     endif()
 endif()
 
-if(EXISTS "${PROJECT_SOURCE_DIR}/src/main.cpp")
-    add_executable(void_vault
-        src/main.cpp
-        src/vault/vault.cpp
-        src/security/auth.cpp
-        src/security/encryption.cpp
-        src/storage/storage.cpp
-    )
+option(
+    VOID_VAULT_STATIC_RUNTIME
+    "MinGW: link libstdc++/libsodium/winpthread statically so foreign DLLs on PATH (e.g. Anaconda) cannot shadow them"
+    ON
+)
 
-    target_link_libraries(
-        void_vault
-        PRIVATE 
-        void_vault_options
-        PkgConfig::SODIUM
-    )
-
-    target_include_directories(
-        void_vault
-        PRIVATE 
-        "${PROJECT_SOURCE_DIR}/include"
-    )
-
+if(MINGW AND VOID_VAULT_STATIC_RUNTIME)
+    target_link_options(void_vault_options INTERFACE -static)
+    target_compile_definitions(void_vault_options INTERFACE SODIUM_STATIC)
+    set(VOID_VAULT_SODIUM_LIBS ${SODIUM_STATIC_LIBRARIES})
+    target_link_directories(void_vault_options INTERFACE ${SODIUM_STATIC_LIBRARY_DIRS})
 else()
-    message(STATUS
-        "Application target deferred: src/main.cpp "
-        "has not been created yet."
-    )
-
+    set(VOID_VAULT_SODIUM_LIBS PkgConfig::SODIUM)
 endif()
 
+# Shared security/storage core used by the application and every test.
+add_library(void_vault_core STATIC
+    src/vault/vault.cpp
+    src/security/auth.cpp
+    src/security/encryption.cpp
+    src/storage/storage.cpp
+)
+
+target_include_directories(
+    void_vault_core
+    PUBLIC
+    "${PROJECT_SOURCE_DIR}/include"
+    "${PROJECT_SOURCE_DIR}/src"
+    ${SODIUM_INCLUDE_DIRS}
+)
+
+target_link_libraries(
+    void_vault_core
+    PUBLIC
+    void_vault_options
+    ${VOID_VAULT_SODIUM_LIBS}
+)
+
+add_executable(void_vault src/main.cpp)
+target_link_libraries(void_vault PRIVATE void_vault_core)
 if(VOID_VAULT_BUILD_TESTS)
     enable_testing()
 

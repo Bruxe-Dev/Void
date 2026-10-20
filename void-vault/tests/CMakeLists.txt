@@ -1,89 +1,16 @@
-add_executable(storage_test
-    storage_test.cpp
-    ../src/storage/storage.cpp
-)
+foreach(test_name storage_test auth_test encryption_test vault_test)
+    add_executable(${test_name} ${test_name}.cpp test_util.hpp)
+    target_link_libraries(${test_name} PRIVATE void_vault_core)
+    add_test(NAME ${test_name} COMMAND ${test_name})
+    set_tests_properties(${test_name} PROPERTIES
+        WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
+endforeach()
 
-target_link_libraries(
-    storage_test
-    PRIVATE void_vault_options
-)
-
-target_include_directories(
-    storage_test
-    PRIVATE "${PROJECT_SOURCE_DIR}/include"
-)
-
+# End-to-end: the real application executed as separate processes.
 add_test(
-    NAME storage_test
-    COMMAND storage_test
-)
-
-add_executable(auth_test
-	auth_test.cpp
-	../src/security/auth.cpp
-)
-
-target_link_libraries(
-    auth_test
-    PRIVATE
-    void_vault_options
-    PkgConfig::SODIUM
-)
-
-target_include_directories(
-	auth_test
-	PRIVATE "${PROJECT_SOURCE_DIR}src/security" 
-)
-
-add_test(
-	NAME auth_test
-	COMMAND auth_test
-)
-
-add_executable(encryption_test
-    encryption_test.cpp
-    ../src/security/encryption.cpp
-)
-
-target_link_libraries(
-    encryption_test
-    PRIVATE
-    void_vault_options
-    PkgConfig::SODIUM
-)
-
-target_include_directories(
-    encryption_test
-    PRIVATE "${PROJECT_SOURCE_DIR}/include"
-)
-
-add_test(
-    NAME encryption_test
-    COMMAND encryption_test
-)
-
-
-add_executable(vault_test
-    vault_test.cpp
-    ../src/vault/vault.cpp
-    ../src/security/auth.cpp
-    ../src/security/encryption.cpp
-    ../src/storage/storage.cpp
-)
-
-target_link_libraries(
-    vault_test
-    PRIVATE
-    void_vault_options
-    PkgConfig::SODIUM
-)
-
-target_include_directories(
-    vault_test
-    PRIVATE "${PROJECT_SOURCE_DIR}/include"
-)
-
-add_test(
-    NAME vault_test
-    COMMAND vault_test
+    NAME app_e2e_test
+    COMMAND ${CMAKE_COMMAND}
+        -DAPP=$<TARGET_FILE:void_vault>
+        -DWORK_DIR=${CMAKE_CURRENT_BINARY_DIR}/e2e_data
+        -P ${CMAKE_CURRENT_SOURCE_DIR}/app_e2e_test.cmake
 )
