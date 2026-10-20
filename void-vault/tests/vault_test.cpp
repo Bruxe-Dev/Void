@@ -1,105 +1,107 @@
-#include "../src/vault/vault.hpp"
+#include "vault/vault.hpp"
 
-#include <cstdlib>
 #include <cstdio>
-#include <fstream>
-#include <iostream>
-#include <iterator>
 #include <string>
 
-void check(bool condition, const char *message)
-{
-    if (!condition)
-    {
-        std::cerr << "FAILED: " << message << '\n';
-        std::exit(EXIT_FAILURE);
-    }
-}
+#include "test_util.hpp"
+
+using tu::check;
 
 int main()
 {
-    const std::string test_file = "vault_test_data.dat";
+    std::cout << "=== Vault Integration Tests ===\n";
+    tu::TempDir dir("vault");
+    const std::string test_file = dir.file("vault_test_data.dat");
+    const std::string auth_file = dir.file("vault_test_auth.dat");
     const std::string password = "VaultTestPassword123!";
     const std::string original = "Confidential Void Vault test data";
 
-    std::remove(test_file.c_str());
-
-    Authorizer authorizer;
-    Storage storage(test_file);
-    Vault vault(authorizer, storage);
-
-    check(
-        authorizer.setPassword(password),
-        "Password setup");
-
-    check(!vault.isUnlocked(), "Vault starts locked");
-    check(!vault.saveData(original), "Saving while locked is rejected");
-
-    std::string loaded;
-    check(!vault.loadData(loaded), "Loading while locked is rejected");
-
-    check(vault.authenticate(password), "Correct password authenticates");
-    check(vault.unlock(), "Authenticated vault unlocks");
-    check(vault.isUnlocked(), "Vault reports unlocked");
-
-    check(vault.saveData(original), "Saving encrypted data succeeds");
-
-    std::ifstream file(test_file, std::ios::binary);
-    check(file.is_open(), "Encrypted file exists and opens");
-
-    const std::string disk_data{
-        std::istreambuf_iterator<char>(file),
-        std::istreambuf_iterator<char>()};
-
-    file.close();
-
-    check(!disk_data.empty(), "Encrypted file is not empty");
-    check(
-        disk_data.find(original) == std::string::npos,
-        "Plaintext is absent from encrypted file");
-
-    check(vault.loadData(loaded), "Loading encrypted data succeeds");
-    check(loaded == original, "Loaded data matches original");
-
-    vault.lock();
-
-    check(!vault.isUnlocked(), "Vault locks successfully");
-    check(!vault.saveData(original), "Saving after locking is rejected");
-    check(!vault.loadData(loaded), "Loading after locking is rejected");
-
-    check(vault.authenticate(password), "Re-authentication succeeds");
-    check(vault.unlock(), "Vault unlocks again");
-
-    std::string corrupted = disk_data;
-    corrupted.back() ^= 1;
-
+    std::string disk_data;
     {
-        std::ofstream output(
-            test_file,
-            std::ios::binary | std::ios::trunc);
+        Authorizer authorizer(auth_file);
+        Storage storage(test_file);
+        Vault vault(authorizer, storage);
 
-        check(output.is_open(), "Corrupted file opens for writing");
+        check(authorizer.setPassword(password), "Password setup");
 
-        output.write(
-            corrupted.data(),
-            static_cast<std::streamsize>(corrupted.size()));
+        check(!vault.isUnlocked(), "Vault starts locked");
+        check(!vault.unlock(), "Unlock without authentication rejected");
+        check(!vault.saveData(original), "Saving while locked is rejected");
+        check(vault.lastError() == VaultError::Locked, "Locked error reported");
 
-        check(output.good(), "Corrupted data is written");
+        std::string loaded;
+        check(!vault.loadData(loaded), "Loading while locked is rejected");
+
+        check(!vault.authenticate("WrongPassword123!"), "Wrong password fails");
+        check(!vault.unlock() && !vault.isUnlocked(), "Failed authentication leaves vault locked");
+
+        check(vault.authenticate(password), "Correct password authenticates");
+        check(vault.unlock(), "Authenticated vault unlocks");
+        check(vault.isUnlocked(), "Vault reports unlocked");
+
+        check(!vault.loadData(loaded) && vault.lastError() == VaultError::NoData, "NoData before first save");
+
+        check(vault.saveData(original), "Saving encrypted data succeeds");
+
+        disk_data = tu::readAll(test_file);
+        check(!disk_data.empty(), "Encrypted file is not empty");
+        check(disk_data.find(original) == std::string::npos, "Plaintext is absent from encrypted file");
+
+        check(vault.loadData(loaded) && loaded == original, "Loaded data matches original");
+
+        vault.lock();
+        vault.lock();
+        check(!vault.isUnlocked() && !authorizer.isAuthorized(), "Lock is idempotent and revokes authorization");
+        check(!vault.saveData(original), "Saving after locking is rejected");
+        check(!vault.loadData(loaded), "Loading after locking is rejected");
+
+        check(vault.authenticate(password), "Re-authentication succeeds");
+        check(vault.unlock(), "Vault unlocks again");
+        check(vault.saveData(""), "Saving empty data succeeds");
+        check(vault.loadData(loaded) && loaded.empty(), "Empty data loads");
+        check(vault.saveData(original), "Restore original data");
+        disk_data = tu::readAll(test_file);
+
+        // Corruption
+        std::string corrupted = disk_data;
+        corrupted.back() = static_cast<char>(corrupted.back() ^ 1);
+        tu::writeAll(test_file, corrupted);
+
+        const std::string previous_loaded = loaded;
+        check(!vault.loadData(loaded), "Corrupted ciphertext is rejected");
+        check(vault.lastError() == VaultError::DecryptFailed, "DecryptFailed reported");
+        check(loaded == previous_loaded, "Failed decryption does not overwrite output data");
+        check(!vault.saveData("new data"), "Refuses to overwrite undecryptable data");
+        check(vault.lastError() == VaultError::ForeignDataExists, "ForeignDataExists reported");
+        check(tu::readAll(test_file) == corrupted, "Undecryptable data file preserved");
+
+        tu::writeAll(test_file, disk_data);
+        vault.lock();
     }
 
-    const std::string previous_loaded = loaded;
+    // Restart: new objects, same files.
+    {
+        Authorizer authorizer(auth_file);
+        Storage storage(test_file);
+        Vault vault(authorizer, storage);
+        std::string loaded;
+        check(vault.authenticate(password) && vault.unlock(), "Unlock after restart");
+        check(vault.loadData(loaded) && loaded == original, "Data persists across restart");
+    }
 
-    check(
-        !vault.loadData(loaded),
-        "Corrupted ciphertext is rejected");
+    // Foreign data: another account with a different password must not overwrite.
+    {
+        const std::string other_auth = dir.file("other_auth.dat");
+        Authorizer other(other_auth);
+        Storage storage(test_file);
+        Vault vault(other, storage);
+        check(other.setPassword("DifferentPassword456!"), "Second account setup");
+        check(vault.authenticate("DifferentPassword456!") && vault.unlock(), "Second account unlocks");
+        std::string loaded = "keep";
+        check(!vault.loadData(loaded) && loaded == "keep", "Other password cannot read data");
+        check(!vault.saveData("overwrite attempt"), "Other password cannot overwrite data");
+        check(tu::readAll(test_file) == disk_data, "Original data intact");
+    }
 
-    check(
-        loaded == previous_loaded,
-        "Failed decryption does not overwrite output data");
-
-    vault.lock();
-    std::remove(test_file.c_str());
-
-    std::cout << "All vault integration tests passed.\n";
-    return EXIT_SUCCESS;
+    return tu::finish("vault");
 }

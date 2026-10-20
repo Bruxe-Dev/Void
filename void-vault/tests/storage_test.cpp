@@ -1,48 +1,49 @@
-#include <cstdio>
-#include <iostream>
+#include <filesystem>
 #include <string>
 
 #include "storage.hpp"
+#include "test_util.hpp"
+
+using tu::check;
 
 int main()
 {
-    const std::string test_file = "storage_test_data.tmp";
+    std::cout << "=== Storage Tests ===\n";
+    tu::TempDir dir("storage");
+    const std::string test_file = dir.file("storage_test_data.dat");
     Storage storage(test_file);
 
     const std::string expected = "Void Vault storage test";
-    std::string loaded;
+    std::string loaded = "sentinel";
 
-    std::cout << "=== Storage Tests ===\n";
+    check(!storage.exists(), "File absent initially");
+    check(!storage.load(loaded), "Loading a missing file fails");
+    check(loaded == "sentinel", "Failed load leaves output untouched");
 
-    if (!storage.save(expected))
-    {
-        std::cerr << "FAIL: Could not save data\n";
-        return 1;
-    }
+    check(storage.save(expected), "Save data");
+    check(storage.exists(), "File exists after save");
+    check(storage.load(loaded) && loaded == expected, "Load returns saved content");
 
-    std::cout << "PASS: Save data\n";
+    check(storage.save("second version"), "Overwrite save succeeds");
+    check(storage.load(loaded) && loaded == "second version", "Atomic overwrite replaced content");
+    check(!std::filesystem::exists(test_file + ".tmp"), "No temp file left behind");
 
-    if (!storage.load(loaded))
-    {
-        std::cerr << "FAIL: Could not load data\n";
-        return 1;
-    }
+    const std::string binary("a\0b\0c", 5);
+    check(storage.save(binary) && storage.load(loaded) && loaded == binary, "Binary data with NULs round-trips");
 
-    std::cout << "PASS: Load data\n";
+    check(storage.save("") && storage.load(loaded) && loaded.empty(), "Empty data round-trips");
 
-    if (loaded != expected)
-    {
-        std::cerr << "FAIL: Loaded content differs\n";
-        return 1;
-    }
+    const std::string bad_path = dir.file("missing_dir/sub/file.dat");
+    Storage bad(bad_path);
+    check(!bad.save("x"), "Save into nonexistent directory fails");
+    check(!std::filesystem::exists(bad_path) && !std::filesystem::exists(bad_path + ".tmp"),
+          "Failed save creates no files");
 
-    std::cout << "PASS: Content verification\n";
+    const std::string no_replace = dir.file("noreplace.dat");
+    check(Storage::atomicWrite(no_replace, "original", false), "allow_replace=false creates new file");
+    check(!Storage::atomicWrite(no_replace, "attacker", false), "allow_replace=false refuses to overwrite");
+    check(tu::readAll(no_replace) == "original", "Existing file preserved");
+    check(!std::filesystem::exists(no_replace + ".tmp"), "No temp file after refused write");
 
-    if (std::remove(test_file.c_str()) != 0)
-    {
-        std::cerr << "WARNING: Could not remove test file\n";
-    }
-
-    std::cout << "All storage tests passed.\n";
-    return 0;
+    return tu::finish("storage");
 }
