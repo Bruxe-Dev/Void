@@ -7,6 +7,22 @@
 namespace
 {
     constexpr char MAGIC[] = "VV01";
+    constexpr std::size_t MAGIC_SIZE = sizeof(MAGIC) - 1;
+    constexpr std::size_t HEADER_SIZE =
+        MAGIC_SIZE + crypto_pwhash_SALTBYTES + crypto_secretbox_NONCEBYTES;
+
+    bool deriveKey(unsigned char *key, std::string_view password, const unsigned char *salt)
+    {
+        return crypto_pwhash(
+                   key,
+                   crypto_secretbox_KEYBYTES,
+                   password.data(),
+                   password.size(),
+                   salt,
+                   crypto_pwhash_OPSLIMIT_INTERACTIVE,
+                   crypto_pwhash_MEMLIMIT_INTERACTIVE,
+                   crypto_pwhash_ALG_ARGON2ID13) == 0;
+    }
 }
 
 Encryption::Encryption()
@@ -18,11 +34,12 @@ Encryption::Encryption()
 }
 
 bool Encryption::encrypt(
-    const std::string &plaintext,
-    const std::string &password,
+    std::string_view plaintext,
+    std::string_view password,
     std::string &encrypted_data)
 {
-    if (password.empty())
+    if (password.empty() ||
+        plaintext.size() > crypto_secretbox_MESSAGEBYTES_MAX - crypto_secretbox_MACBYTES)
     {
         return false;
     }
@@ -34,91 +51,65 @@ bool Encryption::encrypt(
     randombytes_buf(salt, sizeof salt);
     randombytes_buf(nonce, sizeof nonce);
 
-    if (crypto_pwhash(
-            key,
-            sizeof key,
-            password.data(),
-            password.size(),
-            salt,
-            crypto_pwhash_OPSLIMIT_INTERACTIVE,
-            crypto_pwhash_MEMLIMIT_INTERACTIVE,
-            crypto_pwhash_ALG_ARGON2ID13) != 0)
+    if (!deriveKey(key, password, salt))
     {
         sodium_memzero(key, sizeof key);
         return false;
     }
 
-    std::string ciphertext(
-        plaintext.size() + crypto_secretbox_MACBYTES, '\0');
+    std::string record(HEADER_SIZE + crypto_secretbox_MACBYTES + plaintext.size(), '\0');
+    auto *out = reinterpret_cast<unsigned char *>(record.data());
+    std::copy(MAGIC, MAGIC + MAGIC_SIZE, record.begin());
+    std::copy(salt, salt + sizeof salt, out + MAGIC_SIZE);
+    std::copy(nonce, nonce + sizeof nonce, out + MAGIC_SIZE + sizeof salt);
 
-    crypto_secretbox_easy(
-        reinterpret_cast<unsigned char *>(ciphertext.data()),
+    const int status = crypto_secretbox_easy(
+        out + HEADER_SIZE,
         reinterpret_cast<const unsigned char *>(plaintext.data()),
         plaintext.size(),
         nonce,
         key);
 
-    encrypted_data.assign(MAGIC, sizeof(MAGIC) - 1);
-    encrypted_data.append(
-        reinterpret_cast<const char *>(salt), sizeof salt);
-    encrypted_data.append(
-        reinterpret_cast<const char *>(nonce), sizeof nonce);
-    encrypted_data.append(ciphertext);
-
     sodium_memzero(key, sizeof key);
+
+    if (status != 0)
+    {
+        sodium_memzero(record.data(), record.size());
+        return false;
+    }
+
+    encrypted_data = std::move(record);
     return true;
 }
 
 bool Encryption::decrypt(
-    const std::string &encrypted_data,
-    const std::string &password,
+    std::string_view encrypted_data,
+    std::string_view password,
     std::string &plaintext)
 {
-    constexpr std::size_t HEADER_SIZE =
-        sizeof(MAGIC) - 1 +
-        crypto_pwhash_SALTBYTES +
-        crypto_secretbox_NONCEBYTES;
-
     if (password.empty() ||
         encrypted_data.size() < HEADER_SIZE + crypto_secretbox_MACBYTES ||
-        encrypted_data.compare(0, sizeof(MAGIC) - 1, MAGIC) != 0)
+        encrypted_data.compare(0, MAGIC_SIZE, MAGIC) != 0)
     {
         return false;
     }
 
     const auto *bytes =
         reinterpret_cast<const unsigned char *>(encrypted_data.data());
-
-    const unsigned char *salt =
-        bytes + sizeof(MAGIC) - 1;
-
-    const unsigned char *nonce =
-        salt + crypto_pwhash_SALTBYTES;
-
-    const unsigned char *ciphertext =
-        nonce + crypto_secretbox_NONCEBYTES;
-
-    const std::size_t ciphertext_size =
-        encrypted_data.size() - HEADER_SIZE;
+    const unsigned char *salt = bytes + MAGIC_SIZE;
+    const unsigned char *nonce = salt + crypto_pwhash_SALTBYTES;
+    const unsigned char *ciphertext = nonce + crypto_secretbox_NONCEBYTES;
+    const std::size_t ciphertext_size = encrypted_data.size() - HEADER_SIZE;
 
     unsigned char key[crypto_secretbox_KEYBYTES];
 
-    if (crypto_pwhash(
-            key,
-            sizeof key,
-            password.data(),
-            password.size(),
-            salt,
-            crypto_pwhash_OPSLIMIT_INTERACTIVE,
-            crypto_pwhash_MEMLIMIT_INTERACTIVE,
-            crypto_pwhash_ALG_ARGON2ID13) != 0)
+    if (!deriveKey(key, password, salt))
     {
         sodium_memzero(key, sizeof key);
         return false;
     }
 
-    std::string result(
-        ciphertext_size - crypto_secretbox_MACBYTES, '\0');
+    std::string result(ciphertext_size - crypto_secretbox_MACBYTES, '\0');
 
     const int status = crypto_secretbox_open_easy(
         reinterpret_cast<unsigned char *>(result.data()),
@@ -131,9 +122,15 @@ bool Encryption::decrypt(
 
     if (status != 0)
     {
+        sodium_memzero(result.data(), result.size());
         return false;
     }
 
+    // Wipe the previous plaintext held by the caller before replacing it.
+    if (!plaintext.empty())
+    {
+        sodium_memzero(plaintext.data(), plaintext.size());
+    }
     plaintext = std::move(result);
     return true;
 }
