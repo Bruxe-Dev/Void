@@ -23,16 +23,16 @@ import numpy as np
 import pandas as pd
 from numpy.lib.stride_tricks import sliding_window_view
 
-from regime_filter import compute_regime_features
+import _bootstrap  # noqa: F401
+from void_fx.config import MT5_PATH, RAW_DATA_DIR, SYMBOLS
+from void_fx.features.regime import _hysteresis_state, compute_regime_features
 
-SYMBOLS = ["EURUSD", "GBPUSD"]
 NUM_BARS = 30_000
 MAX_BARS = 24
 PT_MULT, SL_MULT = 2.0, 1.0
 TRAIN_RATIO = 0.8
 MIN_COVERAGE = 0.10          # gate must allow at least 10% of bars, else too few trades
-MT5_PATH = r"C:\Program Files\MetaTrader 5\terminal64.exe"
-CACHE_DIR = Path("data-engine")
+CACHE_DIR = RAW_DATA_DIR
 
 
 # ------------------------------------------------------------------
@@ -146,7 +146,6 @@ def evaluate(df: pd.DataFrame, enter, exit_, hurst_thr) -> dict:
 
 
 def apply_gate(full: pd.DataFrame, enter, exit_, hurst_thr) -> pd.Series:
-    from regime_filter import _hysteresis_state
     parts = []
     for _, g in full.groupby("symbol", sort=False):
         st = _hysteresis_state(g["adx"].to_numpy(), enter, exit_)
