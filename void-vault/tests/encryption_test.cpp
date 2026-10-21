@@ -1,4 +1,5 @@
 #include "security/encryption.hpp"
+#include "security/secure_buffer.hpp"
 
 #include <string>
 
@@ -20,6 +21,7 @@ int main()
     const bool enc_ok = encryption.encrypt(original, password, encrypted);
     check(enc_ok, "Encrypt succeeds");
     check(encrypted.size() == 4 + 16 + 24 + 16 + original.size(), "Record size = header + MAC + plaintext");
+    check(encrypted.compare(0, 4, "VV02") == 0, "Default AEAD record uses VV02 header");
     check(encrypted.find(original) == std::string::npos, "Ciphertext does not contain plaintext");
     check(encryption.decrypt(encrypted, password, decrypted) && decrypted == original, "Round trip");
 
@@ -48,6 +50,13 @@ int main()
         }
         check(all_rejected, "Tampering anywhere (magic/salt/nonce/MAC/ciphertext) rejected");
 
+        // Header downgrade attack: changing VV02 -> VV01 with same salt/nonce/ciphertext is rejected.
+        std::string downgraded = encrypted;
+        downgraded[3] = '1';
+        std::string downgrade_out = "unchanged";
+        check(!encryption.decrypt(downgraded, password, downgrade_out) && downgrade_out == "unchanged",
+              "Header version downgrade attack rejected by AEAD AAD");
+
         bool truncated_rejected = true;
         for (std::size_t len : {std::size_t{0}, std::size_t{3}, std::size_t{4}, std::size_t{44},
                                 std::size_t{59}, encrypted.size() - 1})
@@ -62,6 +71,42 @@ int main()
 
         std::string extended = encrypted + "X";
         check(!encryption.decrypt(extended, password, result), "Appended bytes rejected");
+    }
+
+    // Legacy VV01 backward-compatibility round-trip test.
+    {
+        std::string legacy_v1;
+        std::string legacy_dec;
+        check(encryption.encryptLegacyV1(original, password, legacy_v1) &&
+                  legacy_v1.compare(0, 4, "VV01") == 0,
+              "Legacy VV01 record generated");
+        check(encryption.decrypt(legacy_v1, password, legacy_dec) && legacy_dec == original,
+              "Legacy VV01 record decrypts transparently");
+    }
+
+    // Moderate KDF profile self-describing header round-trip test.
+    {
+        Encryption mod_enc(KdfProfile::Moderate);
+        std::string mod_cipher, mod_plain;
+        check(mod_enc.encrypt(original, password, mod_cipher) &&
+                  mod_cipher.compare(0, 4, "VV2M") == 0,
+              "Moderate KDF profile encodes VV2M header");
+        check(encryption.decrypt(mod_cipher, password, mod_plain) && mod_plain == original,
+              "Default Encryption instance auto-detects and decrypts VV2M record");
+    }
+
+    // SecureBuffer incremental push_back/pop_back/constantTimeEquals test.
+    {
+        SecureBuffer sb1, sb2;
+        for (char c : std::string_view("SecretPass123!"))
+        {
+            check(sb1.push_back(c), "SecureBuffer push_back");
+        }
+        sb1.push_back('X');
+        sb1.pop_back();
+        sb2.assign("SecretPass123!");
+        check(sb1.constantTimeEquals(sb2), "SecureBuffer constantTimeEquals matches identical content");
+        check(!sb1.constantTimeEquals("DifferentPass1!"), "SecureBuffer constantTimeEquals rejects different content");
     }
 
     check(!encryption.decrypt("VV01", password, result), "Header-only record rejected");

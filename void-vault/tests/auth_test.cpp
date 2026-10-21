@@ -21,7 +21,10 @@ int main()
     {
         Authorizer authorizer;
         check(!authorizer.setPassword("short"), "Reject short password");
-        check(!authorizer.isInitialized(), "Short password leaves account uninitialized");
+        check(!authorizer.setPassword("aaaaaaaaaaaa"), "Reject single-character repeated password");
+        check(!authorizer.setPassword("            "), "Reject all-whitespace password");
+        check(!authorizer.setPassword(std::string("ValidPrefix1\0hidden", 19)), "Reject password with NUL/control char");
+        check(!authorizer.isInitialized(), "Rejected passwords leave account uninitialized");
     }
 
     tu::TempDir dir("auth");
@@ -137,6 +140,26 @@ int main()
         check(!k.hasStorageError(), "Missing parent dir: treated as no account");
         check(!k.setPassword(password), "Setup fails when the file cannot be written");
         check(!k.isInitialized(), "Failed setup leaves account uninitialized");
+    }
+
+    // --- Persistent password rotation ---
+    {
+        const std::string rot_file = dir.file("rotate.dat");
+        const std::string new_pw = "RotatedPassword456!";
+        {
+            Authorizer r(rot_file);
+            check(r.setPassword(password), "Initial setup for rotation");
+            check(!r.changePassword("WrongCurrent123!", new_pw), "Rotation with wrong current password fails");
+            check(r.failedAttempts() == 1, "Failed rotation increments failed counter");
+            check(!r.changePassword(password, "short"), "Rotation to weak password fails");
+            check(r.changePassword(password, new_pw), "Rotation with valid current and new password succeeds");
+            check(r.failedAttempts() == 0, "Rotation resets failed counter");
+        }
+        {
+            Authorizer r2(rot_file);
+            check(!r2.verifyPassword(password), "Old password rejected after rotation");
+            check(r2.verifyPassword(new_pw), "New password accepted after restart");
+        }
     }
 
     return tu::finish("auth");

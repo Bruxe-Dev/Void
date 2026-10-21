@@ -45,5 +45,40 @@ int main()
     check(tu::readAll(no_replace) == "original", "Existing file preserved");
     check(!std::filesystem::exists(no_replace + ".tmp"), "No temp file after refused write");
 
+    // --- FileLock concurrency & contention tests ---
+    {
+        const std::string lock_target = dir.file("lock_target.dat");
+        FileLock lock1(lock_target);
+        check(lock1.isLocked(), "First FileLock acquires exclusive lock");
+        {
+            FileLock lock2(lock_target);
+            check(!lock2.isLocked(), "Second FileLock on same target fails immediately");
+            Storage locked_storage(lock_target);
+            check(!locked_storage.save("blocked"), "Storage::save fails while external FileLock is held");
+        }
+        lock1.unlock();
+        check(!lock1.isLocked(), "FileLock::unlock releases lock");
+        FileLock lock3(lock_target);
+        check(lock3.isLocked(), "Subsequent FileLock succeeds after unlock");
+    }
+
+    // --- Owner-only permissions test ---
+    check(Storage::restrictPermissions(test_file), "restrictPermissions succeeds on existing regular file");
+
+    // --- Directory read rejection ---
+    {
+        std::string dir_out = "unchanged";
+        check(!Storage::readFile(dir.path.string(), dir_out) && dir_out == "unchanged",
+              "readFile rejects directory paths");
+    }
+
+    // --- MAX_FILE_SIZE enforcement ---
+    {
+        const std::string oversized_path = dir.file("oversized.dat");
+        std::string huge(Storage::MAX_FILE_SIZE + 1, 'X');
+        check(!Storage::atomicWrite(oversized_path, huge, true),
+              "atomicWrite rejects payload exceeding MAX_FILE_SIZE");
+    }
+
     return tu::finish("storage");
 }

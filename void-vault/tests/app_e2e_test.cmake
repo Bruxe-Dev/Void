@@ -4,6 +4,7 @@ file(REMOVE_RECURSE "${WORK_DIR}")
 file(MAKE_DIRECTORY "${WORK_DIR}")
 
 set(PW "E2ePassword-123456")
+set(PW2 "E2eRotatedPass-7890!")
 set(SECRET "e2e-confidential-payload-42")
 
 function(run_app name input expect_rc)
@@ -52,11 +53,17 @@ if(NOT pw_pos EQUAL -1)
     message(FATAL_ERROR "password found in vault_auth.dat")
 endif()
 
-# Run 2: new process, unlock, show data, EOF exit.
-run_app(run2 "1\n${PW}\n3\n" 0)
+# Run 2: new process, unlock, show data, rotate password (option 7), EOF exit.
+run_app(run2 "1\n${PW}\n3\n7\n${PW}\n${PW2}\n${PW2}\n" 0)
 expect_contains(run2 "Vault unlocked.")
 expect_contains(run2 "Stored data: ${SECRET}")
+expect_contains(run2 "Password changed and data re-encrypted.")
 expect_contains(run2 "Input closed. Locking and exiting.")
+
+# Run 2b: new process, verify rotated password unlocks and loads re-encrypted secret.
+run_app(run2b "1\n${PW2}\n3\n6\n" 0)
+expect_contains(run2b "Vault unlocked.")
+expect_contains(run2b "Stored data: ${SECRET}")
 
 # Run 3: invalid menu input handled; wrong passwords -> lockout.
 run_app(run3 "abc\n1\nbad-password-1\n1\nbad-password-2\n1\nbad-password-3\n1\nbad-password-4\n1\nbad-password-5\n" 4)
@@ -64,7 +71,7 @@ expect_contains(run3 "Unknown option.")
 expect_contains(run3 "Account is locked")
 
 # Run 4: lockout persists across processes, even with the correct password.
-run_app(run4 "1\n${PW}\n" 4)
+run_app(run4 "1\n${PW2}\n" 4)
 expect_contains(run4 "Account is locked")
 
 # Run 5: corrupted auth file -> refuse, never re-initialize.

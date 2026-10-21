@@ -103,5 +103,33 @@ int main()
         check(tu::readAll(test_file) == disk_data, "Original data intact");
     }
 
+    // Atomic password rotation re-encrypts stored data seamlessly.
+    const std::string rotated_pw = "RotatedVaultPass789!";
+    {
+        Authorizer authorizer(auth_file);
+        Storage storage(test_file);
+        Vault vault(authorizer, storage);
+        check(!vault.changePassword(password, rotated_pw) && vault.lastError() == VaultError::Locked,
+              "changePassword while locked is rejected");
+        check(vault.authenticate(password) && vault.unlock(), "Unlock before rotation");
+        check(!vault.changePassword(password, "short") && vault.lastError() == VaultError::WeakPassword,
+              "changePassword rejects weak new password");
+        check(!vault.changePassword("WrongCurrentPass!", rotated_pw) && !vault.isUnlocked(),
+              "changePassword with wrong current password locks vault");
+        check(vault.authenticate(password) && vault.unlock(), "Re-unlock after failed rotation");
+        check(vault.changePassword(password, rotated_pw), "changePassword succeeds and re-encrypts data");
+        std::string loaded;
+        check(vault.loadData(loaded) && loaded == original, "Data readable immediately after rotation");
+    }
+    {
+        Authorizer authorizer(auth_file);
+        Storage storage(test_file);
+        Vault vault(authorizer, storage);
+        check(!vault.authenticate(password), "Old password rejected after rotation");
+        check(vault.authenticate(rotated_pw) && vault.unlock(), "New password unlocks after restart");
+        std::string loaded;
+        check(vault.loadData(loaded) && loaded == original, "Re-encrypted data persists across restart");
+    }
+
     return tu::finish("vault");
 }
