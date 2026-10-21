@@ -203,6 +203,9 @@ CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ranges_algobase.h \
  C:/msys64/ucrt64/include/c++/15.2.0/pstl/glue_algorithm_defs.h \
  C:/msys64/ucrt64/include/c++/15.2.0/pstl/execution_defs.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/cstring \
+ C:/msys64/ucrt64/include/string.h \
+ C:/msys64/ucrt64/include/sec_api/string_s.h \
  C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
  C:/msys64/ucrt64/include/c++/15.2.0/exception \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \

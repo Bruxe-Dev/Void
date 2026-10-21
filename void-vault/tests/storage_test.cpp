@@ -68,7 +68,7 @@ int main()
     // --- Directory read rejection ---
     {
         std::string dir_out = "unchanged";
-        check(!Storage::readFile(dir.path.string(), dir_out) && dir_out == "unchanged",
+        check(!Storage::readFile(dir.path().string(), dir_out) && dir_out == "unchanged",
               "readFile rejects directory paths");
     }
 

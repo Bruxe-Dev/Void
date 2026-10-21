@@ -266,16 +266,8 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: \
  C:/msys64/ucrt64/include/sodium/crypto_stream_salsa208.h \
  C:/msys64/ucrt64/include/sodium/crypto_stream_xchacha20.h \
  D:\Void\void-vault\src\security/auth.hpp \
- D:\Void\void-vault\src\security/secure_buffer.hpp \
- C:/msys64/ucrt64/include/c++/15.2.0/cstring \
- C:/msys64/ucrt64/include/string.h \
- C:/msys64/ucrt64/include/sec_api/string_s.h \
- D:\Void\void-vault\src\vault/vault.hpp \
- D:/Void/void-vault/src/security/auth.hpp \
- D:/Void/void-vault/src/security/encryption.hpp \
- D:/Void/void-vault/src/security/secure_buffer.hpp \
- D:/Void/void-vault/include/storage.hpp \
- D:/Void/void-vault/include/storage.hpp \
+ D:\Void\void-vault\src\security/encryption.hpp \
+ D:\Void\void-vault\src\security/process_hardening.hpp \
  C:/msys64/ucrt64/include/windows.h C:/msys64/ucrt64/include/sdkddkver.h \
  C:/msys64/ucrt64/include/excpt.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdarg.h \
@@ -291,6 +283,8 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: \
  C:/msys64/ucrt64/include/apiset.h \
  C:/msys64/ucrt64/include/psdk_inc/intrin-impl.h \
  C:/msys64/ucrt64/include/basetsd.h C:/msys64/ucrt64/include/guiddef.h \
+ C:/msys64/ucrt64/include/string.h \
+ C:/msys64/ucrt64/include/sec_api/string_s.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/x86intrin.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/x86gprintrin.h \
  C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/ia32intrin.h \
@@ -456,4 +450,12 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: \
  C:/msys64/ucrt64/include/virtdisk.h C:/msys64/ucrt64/include/stralign.h \
  C:/msys64/ucrt64/include/sec_api/stralign_s.h \
  C:/msys64/ucrt64/include/winsvc.h C:/msys64/ucrt64/include/mcx.h \
- C:/msys64/ucrt64/include/imm.h C:/msys64/ucrt64/include/io.h
+ C:/msys64/ucrt64/include/imm.h \
+ D:\Void\void-vault\src\security/secure_buffer.hpp \
+ C:/msys64/ucrt64/include/c++/15.2.0/cstring \
+ D:\Void\void-vault\src\vault/vault.hpp \
+ D:/Void/void-vault/src/security/auth.hpp \
+ D:/Void/void-vault/src/security/encryption.hpp \
+ D:/Void/void-vault/src/security/secure_buffer.hpp \
+ D:/Void/void-vault/include/storage.hpp \
+ D:/Void/void-vault/include/storage.hpp C:/msys64/ucrt64/include/io.h

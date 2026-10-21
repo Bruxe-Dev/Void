@@ -1,22 +1,27 @@
 CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj: \
  D:\Void\void-vault\src\security\auth.cpp \
  D:\Void\void-vault\src\security\auth.hpp \
- C:/msys64/ucrt64/include/c++/15.2.0/string \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/requires_hosted.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/cstddef \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++config.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/os_defines.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/cpu_defines.h \
  C:/msys64/ucrt64/include/c++/15.2.0/pstl/pstl_config.h \
+ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stddef.h \
+ C:/msys64/ucrt64/include/stddef.h C:/msys64/ucrt64/include/crtdefs.h \
+ C:/msys64/ucrt64/include/corecrt.h C:/msys64/ucrt64/include/_mingw.h \
+ C:/msys64/ucrt64/include/_mingw_mac.h \
+ C:/msys64/ucrt64/include/_mingw_secapi.h \
+ C:/msys64/ucrt64/include/vadefs.h \
+ C:/msys64/ucrt64/include/sdks/_mingw_ddk.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/version.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/string \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/requires_hosted.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stringfwd.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/memoryfwd.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/char_traits.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/postypes.h \
  C:/msys64/ucrt64/include/c++/15.2.0/cwchar \
- C:/msys64/ucrt64/include/wchar.h C:/msys64/ucrt64/include/corecrt.h \
- C:/msys64/ucrt64/include/_mingw.h C:/msys64/ucrt64/include/_mingw_mac.h \
- C:/msys64/ucrt64/include/_mingw_secapi.h \
- C:/msys64/ucrt64/include/vadefs.h \
- C:/msys64/ucrt64/include/sdks/_mingw_ddk.h \
+ C:/msys64/ucrt64/include/wchar.h \
  C:/msys64/ucrt64/include/corecrt_stdio_config.h \
  C:/msys64/ucrt64/include/corecrt_wstdlib.h \
  C:/msys64/ucrt64/include/corecrt_wctype.h \
@@ -25,7 +30,6 @@ CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj: \
  C:/msys64/ucrt64/include/swprintf.inl \
  C:/msys64/ucrt64/include/sec_api/wchar_s.h \
  C:/msys64/ucrt64/include/c++/15.2.0/type_traits \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/version.h \
  C:/msys64/ucrt64/include/c++/15.2.0/compare \
  C:/msys64/ucrt64/include/c++/15.2.0/concepts \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_construct.h \
@@ -48,8 +52,7 @@ CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/localefwd.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++locale.h \
  C:/msys64/ucrt64/include/c++/15.2.0/clocale \
- C:/msys64/ucrt64/include/locale.h C:/msys64/ucrt64/include/crtdefs.h \
- C:/msys64/ucrt64/include/stdio.h \
+ C:/msys64/ucrt64/include/locale.h C:/msys64/ucrt64/include/stdio.h \
  C:/msys64/ucrt64/include/sec_api/stdio_s.h \
  C:/msys64/ucrt64/include/c++/15.2.0/iosfwd \
  C:/msys64/ucrt64/include/c++/15.2.0/cctype \
@@ -98,9 +101,6 @@ CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/charconv.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_string.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/memory_resource.h \
- C:/msys64/ucrt64/include/c++/15.2.0/cstddef \
- C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stddef.h \
- C:/msys64/ucrt64/include/stddef.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator_args.h \
  C:/msys64/ucrt64/include/c++/15.2.0/tuple \

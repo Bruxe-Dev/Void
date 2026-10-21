@@ -1,10 +1,10 @@
-Start testing: Oct 20 21:11 South Africa Standard Time
+Start testing: Oct 21 14:32 South Africa Standard Time
 ----------------------------------------------------------
 1/5 Testing: storage_test
 1/5 Test: storage_test
 Command: "D:/Void/void-vault/build-debug/tests/storage_test.exe"
 Directory: D:/Void/void-vault/build-debug/tests
-"storage_test" start time: Oct 20 21:11 South Africa Standard Time
+"storage_test" start time: Oct 21 14:32 South Africa Standard Time
 Output:
 ----------------------------------------------------------
 === Storage Tests ===
@@ -25,12 +25,20 @@ PASS: allow_replace=false creates new file
 PASS: allow_replace=false refuses to overwrite
 PASS: Existing file preserved
 PASS: No temp file after refused write
+PASS: First FileLock acquires exclusive lock
+PASS: Second FileLock on same target fails immediately
+PASS: Storage::save fails while external FileLock is held
+PASS: FileLock::unlock releases lock
+PASS: Subsequent FileLock succeeds after unlock
+PASS: restrictPermissions succeeds on existing regular file
+PASS: readFile rejects directory paths
+PASS: atomicWrite rejects payload exceeding MAX_FILE_SIZE
 All storage tests passed.
 <end of output>
-Test time =   0.47 sec
+Test time =   0.49 sec
 ----------------------------------------------------------
 Test Passed.
-"storage_test" end time: Oct 20 21:11 South Africa Standard Time
+"storage_test" end time: Oct 21 14:32 South Africa Standard Time
 "storage_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
@@ -38,7 +46,7 @@ Test Passed.
 2/5 Test: auth_test
 Command: "D:/Void/void-vault/build-debug/tests/auth_test.exe"
 Directory: D:/Void/void-vault/build-debug/tests
-"auth_test" start time: Oct 20 21:11 South Africa Standard Time
+"auth_test" start time: Oct 21 14:32 South Africa Standard Time
 Output:
 ----------------------------------------------------------
 === Authentication Tests ===
@@ -46,7 +54,10 @@ PASS: Password setup
 PASS: Second setup rejected
 PASS: Correct password accepted
 PASS: Reject short password
-PASS: Short password leaves account uninitialized
+PASS: Reject single-character repeated password
+PASS: Reject all-whitespace password
+PASS: Reject password with NUL/control char
+PASS: Rejected passwords leave account uninitialized
 PASS: Missing file is not an error
 PASS: Missing file means uninitialized
 PASS: Verify before setup fails
@@ -103,33 +114,63 @@ PASS: Legacy file upgraded to VVAUTH1
 PASS: Missing parent dir: treated as no account
 PASS: Setup fails when the file cannot be written
 PASS: Failed setup leaves account uninitialized
+PASS: Initial setup for rotation
+PASS: Rotation with wrong current password fails
+PASS: Failed rotation increments failed counter
+PASS: Rotation to weak password fails
+PASS: Rotation with valid current and new password succeeds
+PASS: Rotation resets failed counter
+PASS: Old password rejected after rotation
+PASS: New password accepted after restart
 All auth tests passed.
 <end of output>
-Test time =   2.54 sec
+Test time =   3.24 sec
 ----------------------------------------------------------
 Test Passed.
-"auth_test" end time: Oct 20 21:11 South Africa Standard Time
-"auth_test" time elapsed: 00:00:02
+"auth_test" end time: Oct 21 14:32 South Africa Standard Time
+"auth_test" time elapsed: 00:00:03
 ----------------------------------------------------------
 
 3/5 Testing: encryption_test
 3/5 Test: encryption_test
 Command: "D:/Void/void-vault/build-debug/tests/encryption_test.exe"
 Directory: D:/Void/void-vault/build-debug/tests
-"encryption_test" start time: Oct 20 21:11 South Africa Standard Time
+"encryption_test" start time: Oct 21 14:32 South Africa Standard Time
 Output:
 ----------------------------------------------------------
 === Encryption Tests ===
 PASS: Encrypt succeeds
 PASS: Record size = header + MAC + plaintext
+PASS: Default AEAD record uses VV02 header
 PASS: Ciphertext does not contain plaintext
 PASS: Round trip
 PASS: Two encryptions differ (random salt/nonce)
 PASS: Wrong password rejected
 PASS: Failed decrypt leaves output unchanged
 PASS: Tampering anywhere (magic/salt/nonce/MAC/ciphertext) rejected
+PASS: Header version downgrade attack rejected by AEAD AAD
 PASS: Truncated records rejected
 PASS: Appended bytes rejected
+PASS: Legacy VV01 record generated
+PASS: Legacy VV01 record decrypts transparently
+PASS: Moderate KDF profile encodes VV2M header
+PASS: Default Encryption instance auto-detects and decrypts VV2M record
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer push_back
+PASS: SecureBuffer constantTimeEquals matches identical content
+PASS: SecureBuffer constantTimeEquals rejects different content
 PASS: Header-only record rejected
 PASS: Wrong magic rejected
 PASS: Empty password rejected for encrypt
@@ -140,18 +181,18 @@ PASS: 1 MiB plaintext round trip
 PASS: UTF-8 password round trip
 All encryption tests passed.
 <end of output>
-Test time =   3.58 sec
+Test time =   4.87 sec
 ----------------------------------------------------------
 Test Passed.
-"encryption_test" end time: Oct 20 21:11 South Africa Standard Time
-"encryption_test" time elapsed: 00:00:03
+"encryption_test" end time: Oct 21 14:32 South Africa Standard Time
+"encryption_test" time elapsed: 00:00:04
 ----------------------------------------------------------
 
 4/5 Testing: vault_test
 4/5 Test: vault_test
 Command: "D:/Void/void-vault/build-debug/tests/vault_test.exe"
 Directory: D:/Void/void-vault/build-debug/tests
-"vault_test" start time: Oct 20 21:11 South Africa Standard Time
+"vault_test" start time: Oct 21 14:32 South Africa Standard Time
 Output:
 ----------------------------------------------------------
 === Vault Integration Tests ===
@@ -192,29 +233,39 @@ PASS: Second account unlocks
 PASS: Other password cannot read data
 PASS: Other password cannot overwrite data
 PASS: Original data intact
+PASS: changePassword while locked is rejected
+PASS: Unlock before rotation
+PASS: changePassword rejects weak new password
+PASS: changePassword with wrong current password locks vault
+PASS: Re-unlock after failed rotation
+PASS: changePassword succeeds and re-encrypts data
+PASS: Data readable immediately after rotation
+PASS: Old password rejected after rotation
+PASS: New password unlocks after restart
+PASS: Re-encrypted data persists across restart
 All vault tests passed.
 <end of output>
-Test time =   3.21 sec
+Test time =   4.65 sec
 ----------------------------------------------------------
 Test Passed.
-"vault_test" end time: Oct 20 21:11 South Africa Standard Time
-"vault_test" time elapsed: 00:00:03
+"vault_test" end time: Oct 21 14:32 South Africa Standard Time
+"vault_test" time elapsed: 00:00:04
 ----------------------------------------------------------
 
 5/5 Testing: app_e2e_test
 5/5 Test: app_e2e_test
 Command: "C:/Program Files/CMake/bin/cmake.exe" "-DAPP=D:/Void/void-vault/build-debug/void_vault.exe" "-DWORK_DIR=D:/Void/void-vault/build-debug/tests/e2e_data" "-P" "D:/Void/void-vault/tests/app_e2e_test.cmake"
 Directory: D:/Void/void-vault/build-debug/tests
-"app_e2e_test" start time: Oct 20 21:11 South Africa Standard Time
+"app_e2e_test" start time: Oct 21 14:32 South Africa Standard Time
 Output:
 ----------------------------------------------------------
 -- app_e2e_test passed
 <end of output>
-Test time =   3.49 sec
+Test time =   2.81 sec
 ----------------------------------------------------------
 Test Passed.
-"app_e2e_test" end time: Oct 20 21:11 South Africa Standard Time
-"app_e2e_test" time elapsed: 00:00:03
+"app_e2e_test" end time: Oct 21 14:32 South Africa Standard Time
+"app_e2e_test" time elapsed: 00:00:02
 ----------------------------------------------------------
 
-End testing: Oct 20 21:11 South Africa Standard Time
+End testing: Oct 21 14:32 South Africa Standard Time

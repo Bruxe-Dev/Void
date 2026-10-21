@@ -105,18 +105,113 @@ tests/CMakeFiles/encryption_test.dir/encryption_test.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator_args.h \
  C:/msys64/ucrt64/include/c++/15.2.0/tuple \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ranges_util.h \
+ D:/Void/void-vault/src/security/secure_buffer.hpp \
+ C:/msys64/ucrt64/include/sodium.h \
+ C:/msys64/ucrt64/include/sodium/version.h \
+ C:/msys64/ucrt64/include/sodium/export.h \
+ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdint.h \
+ C:/msys64/ucrt64/include/stdint.h C:/msys64/ucrt64/include/sodium/core.h \
+ C:/msys64/ucrt64/include/sodium/crypto_aead_aegis128l.h \
+ C:/msys64/ucrt64/include/sodium/crypto_aead_aegis256.h \
+ C:/msys64/ucrt64/include/sodium/crypto_aead_aes256gcm.h \
+ C:/msys64/ucrt64/include/sodium/crypto_aead_chacha20poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_aead_xchacha20poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_auth.h \
+ C:/msys64/ucrt64/include/sodium/crypto_auth_hmacsha512256.h \
+ C:/msys64/ucrt64/include/sodium/crypto_auth_hmacsha512.h \
+ C:/msys64/ucrt64/include/sodium/crypto_hash_sha512.h \
+ C:/msys64/ucrt64/include/sodium/crypto_auth_hmacsha256.h \
+ C:/msys64/ucrt64/include/sodium/crypto_hash_sha256.h \
+ C:/msys64/ucrt64/include/sodium/crypto_auth_hmacsha512.h \
+ C:/msys64/ucrt64/include/sodium/crypto_auth_hmacsha512256.h \
+ C:/msys64/ucrt64/include/sodium/crypto_box.h \
+ C:/msys64/ucrt64/include/sodium/crypto_box_curve25519xsalsa20poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_stream_xsalsa20.h \
+ C:/msys64/ucrt64/include/sodium/crypto_box_curve25519xsalsa20poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_core_hchacha20.h \
+ C:/msys64/ucrt64/include/sodium/crypto_core_hsalsa20.h \
+ C:/msys64/ucrt64/include/sodium/crypto_core_salsa20.h \
+ C:/msys64/ucrt64/include/sodium/crypto_core_salsa2012.h \
+ C:/msys64/ucrt64/include/sodium/crypto_core_salsa208.h \
+ C:/msys64/ucrt64/include/sodium/crypto_generichash.h \
+ C:/msys64/ucrt64/include/sodium/crypto_generichash_blake2b.h \
+ C:/msys64/ucrt64/include/sodium/crypto_generichash_blake2b.h \
+ C:/msys64/ucrt64/include/sodium/crypto_hash.h \
+ C:/msys64/ucrt64/include/sodium/crypto_hash_sha256.h \
+ C:/msys64/ucrt64/include/sodium/crypto_hash_sha512.h \
+ C:/msys64/ucrt64/include/sodium/crypto_kdf.h \
+ C:/msys64/ucrt64/include/sodium/crypto_kdf_blake2b.h \
+ C:/msys64/ucrt64/include/sodium/crypto_kdf_hkdf_sha256.h \
+ C:/msys64/ucrt64/include/sodium/crypto_kdf.h \
+ C:/msys64/ucrt64/include/sodium/crypto_auth_hmacsha256.h \
+ C:/msys64/ucrt64/include/sodium/crypto_kdf_hkdf_sha512.h \
+ C:/msys64/ucrt64/include/sodium/crypto_kdf_blake2b.h \
+ C:/msys64/ucrt64/include/sodium/crypto_kx.h \
+ C:/msys64/ucrt64/include/sodium/crypto_onetimeauth.h \
+ C:/msys64/ucrt64/include/sodium/crypto_onetimeauth_poly1305.h \
+ C:/msys64/ucrt64/include/sys/types.h \
+ C:/msys64/ucrt64/include/sodium/crypto_onetimeauth_poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_pwhash.h \
+ C:/msys64/ucrt64/include/sodium/crypto_pwhash_argon2i.h \
+ C:/msys64/ucrt64/include/sodium/crypto_pwhash_argon2id.h \
+ C:/msys64/ucrt64/include/sodium/crypto_pwhash_argon2i.h \
+ C:/msys64/ucrt64/include/sodium/crypto_scalarmult.h \
+ C:/msys64/ucrt64/include/sodium/crypto_scalarmult_curve25519.h \
+ C:/msys64/ucrt64/include/sodium/crypto_scalarmult_curve25519.h \
+ C:/msys64/ucrt64/include/sodium/crypto_secretbox.h \
+ C:/msys64/ucrt64/include/sodium/crypto_secretbox_xsalsa20poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_secretbox_xsalsa20poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_secretstream_xchacha20poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_aead_xchacha20poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_stream_chacha20.h \
+ C:/msys64/ucrt64/include/sodium/crypto_shorthash.h \
+ C:/msys64/ucrt64/include/sodium/crypto_shorthash_siphash24.h \
+ C:/msys64/ucrt64/include/sodium/crypto_shorthash_siphash24.h \
+ C:/msys64/ucrt64/include/sodium/crypto_sign.h \
+ C:/msys64/ucrt64/include/sodium/crypto_sign_ed25519.h \
+ C:/msys64/ucrt64/include/sodium/crypto_sign_ed25519.h \
+ C:/msys64/ucrt64/include/sodium/crypto_stream.h \
+ C:/msys64/ucrt64/include/sodium/crypto_stream_chacha20.h \
+ C:/msys64/ucrt64/include/sodium/crypto_stream_salsa20.h \
+ C:/msys64/ucrt64/include/sodium/crypto_stream_xsalsa20.h \
+ C:/msys64/ucrt64/include/sodium/crypto_verify_16.h \
+ C:/msys64/ucrt64/include/sodium/crypto_verify_32.h \
+ C:/msys64/ucrt64/include/sodium/crypto_verify_64.h \
+ C:/msys64/ucrt64/include/sodium/randombytes.h \
+ C:/msys64/ucrt64/include/sodium/randombytes_internal_random.h \
+ C:/msys64/ucrt64/include/sodium/randombytes.h \
+ C:/msys64/ucrt64/include/sodium/randombytes_sysrandom.h \
+ C:/msys64/ucrt64/include/sodium/runtime.h \
+ C:/msys64/ucrt64/include/sodium/utils.h \
+ C:/msys64/ucrt64/include/sodium/crypto_box_curve25519xchacha20poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_stream_xchacha20.h \
+ C:/msys64/ucrt64/include/sodium/crypto_core_ed25519.h \
+ C:/msys64/ucrt64/include/sodium/crypto_core_ristretto255.h \
+ C:/msys64/ucrt64/include/sodium/crypto_pwhash_scryptsalsa208sha256.h \
+ C:/msys64/ucrt64/include/sodium/crypto_scalarmult_ed25519.h \
+ C:/msys64/ucrt64/include/sodium/crypto_scalarmult_ristretto255.h \
+ C:/msys64/ucrt64/include/sodium/crypto_secretbox_xchacha20poly1305.h \
+ C:/msys64/ucrt64/include/sodium/crypto_stream_salsa2012.h \
+ C:/msys64/ucrt64/include/sodium/crypto_stream_salsa208.h \
+ C:/msys64/ucrt64/include/sodium/crypto_stream_xchacha20.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/cstring \
+ C:/msys64/ucrt64/include/string.h \
+ C:/msys64/ucrt64/include/sec_api/string_s.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
+ C:/msys64/ucrt64/include/c++/15.2.0/exception \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
  D:\Void\void-vault\tests\test_util.hpp \
  C:/msys64/ucrt64/include/c++/15.2.0/atomic \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/atomic_base.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/atomic_lockfree_defines.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/atomic_wait.h \
  C:/msys64/ucrt64/include/c++/15.2.0/cstdint \
- C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/stdint.h \
- C:/msys64/ucrt64/include/stdint.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr-default.h \
- C:/msys64/ucrt64/include/pthread.h C:/msys64/ucrt64/include/sys/types.h \
- C:/msys64/ucrt64/include/process.h \
+ C:/msys64/ucrt64/include/pthread.h C:/msys64/ucrt64/include/process.h \
  C:/msys64/ucrt64/include/corecrt_startup.h \
  C:/msys64/ucrt64/include/signal.h \
  C:/msys64/ucrt64/include/pthread_signal.h \
@@ -132,12 +227,6 @@ tests/CMakeFiles/encryption_test.dir/encryption_test.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_fwd.h \
  C:/msys64/ucrt64/include/c++/15.2.0/system_error \
  C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h \
- C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
- C:/msys64/ucrt64/include/c++/15.2.0/exception \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
- C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/chrono.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ratio \
  C:/msys64/ucrt64/include/c++/15.2.0/limits \

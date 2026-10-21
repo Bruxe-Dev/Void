@@ -162,7 +162,11 @@ powershell -ExecutionPolicy Bypass -File scripts\build.ps1 -BuildType Debug -Bui
 
 ### C. Run the Interactive Void Vault Application
 ```powershell
+# Standard interactive KDF profile (64 MiB Argon2id)
 .\build\void_vault.exe --data-dir .
+
+# Maximum-security offline KDF profile (1 GiB Argon2id, 4 iterations)
+.\build\void_vault.exe --data-dir . --kdf sensitive
 ```
-- **What it does:** Launches the interactive encrypted local vault CLI using `vault_auth.dat` and `vault_data.dat` in the specified `--data-dir`. Disables console echo when reading passwords and locks/wipes session memory on exit (`6` or `quit`).
-- **When to run it:** When you want to initialize an account, unlock the local vault, save encrypted text, or load stored confidential text.
+- **What it does:** Launches the hardened interactive encrypted local vault CLI using `vault_auth.dat` and `vault_data.dat` in `--data-dir`. Acquires an exclusive cross-process session lock (`vault_session.lock`), disables console echo and crash dumps, reads secrets directly into `sodium_malloc` guard-paged memory, supports atomic password rotation + data re-encryption (`7) change password`), and wipes session memory on exit (`6` or `quit`).
+- **When to run it:** When you want to initialize an account, unlock the local vault, save encrypted text, load stored confidential text, or rotate your vault passphrase.
