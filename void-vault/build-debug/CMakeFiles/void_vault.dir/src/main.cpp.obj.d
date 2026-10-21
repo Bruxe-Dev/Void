@@ -464,4 +464,5 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: \
  D:/Void/void-vault/src/security/secure_buffer.hpp \
  D:/Void/void-vault/include/storage.hpp \
  D:\Void\void-vault\src\vault/vault.hpp \
- D:/Void/void-vault/include/storage.hpp C:/msys64/ucrt64/include/io.h
+ D:/Void/void-vault/include/storage.hpp C:/msys64/ucrt64/include/conio.h \
+ C:/msys64/ucrt64/include/sec_api/conio_s.h C:/msys64/ucrt64/include/io.h
