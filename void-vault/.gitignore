@@ -1,9 +1,10 @@
-# Build directories
+# Build and release directories
 build/
 build-*/
 biuld/
 cmake-build-*/
 out/
+dist/
 
 # Runtime vault files and locks
 vault_auth.dat

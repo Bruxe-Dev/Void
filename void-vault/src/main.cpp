@@ -178,7 +178,8 @@ namespace
 
     void printHelp()
     {
-        std::cout << "Usage: void_vault [--data-dir <directory>] [--kdf <interactive|moderate|sensitive>] [--help]\n"
+        std::cout << "Void Vault v1.0.0 — Authenticated Encrypted Local Vault\n"
+                     "Usage: void_vault [--data-dir <directory>] [--kdf <interactive|moderate|sensitive>] [--version] [--help]\n"
                      "  Stores vault_auth.dat (password hash + failed-attempt counter)\n"
                      "  and vault_data.dat (XChaCha20-Poly1305 AEAD encrypted record) in the data directory\n"
                      "  (default: current directory). Passwords are only read interactively.\n";
@@ -238,6 +239,11 @@ int main(int argc, char **argv)
         if (arg == "--help" || arg == "-h")
         {
             printHelp();
+            return 0;
+        }
+        if (arg == "--version" || arg == "-v")
+        {
+            std::cout << "void_vault 1.0.0 (libsodium " << sodium_version_string() << ")\n";
             return 0;
         }
         if (arg == "--data-dir" && i + 1 < argc)
