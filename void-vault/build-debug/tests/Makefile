@@ -181,6 +181,20 @@ vault_test/fast:
 	cd /d D:\Void\void-vault\build-debug && $(MAKE) $(MAKESILENT) -f tests\CMakeFiles\vault_test.dir\build.make tests/CMakeFiles/vault_test.dir/build
 .PHONY : vault_test/fast
 
+# Convenience name for target.
+tests/CMakeFiles/broker_test.dir/rule:
+	cd /d D:\Void\void-vault\build-debug && $(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 tests/CMakeFiles/broker_test.dir/rule
+.PHONY : tests/CMakeFiles/broker_test.dir/rule
+
+# Convenience name for target.
+broker_test: tests/CMakeFiles/broker_test.dir/rule
+.PHONY : broker_test
+
+# fast build rule for target.
+broker_test/fast:
+	cd /d D:\Void\void-vault\build-debug && $(MAKE) $(MAKESILENT) -f tests\CMakeFiles\broker_test.dir\build.make tests/CMakeFiles/broker_test.dir/build
+.PHONY : broker_test/fast
+
 auth_test.obj: auth_test.cpp.obj
 .PHONY : auth_test.obj
 
@@ -204,6 +218,30 @@ auth_test.s: auth_test.cpp.s
 auth_test.cpp.s:
 	cd /d D:\Void\void-vault\build-debug && $(MAKE) $(MAKESILENT) -f tests\CMakeFiles\auth_test.dir\build.make tests/CMakeFiles/auth_test.dir/auth_test.cpp.s
 .PHONY : auth_test.cpp.s
+
+broker_test.obj: broker_test.cpp.obj
+.PHONY : broker_test.obj
+
+# target to build an object file
+broker_test.cpp.obj:
+	cd /d D:\Void\void-vault\build-debug && $(MAKE) $(MAKESILENT) -f tests\CMakeFiles\broker_test.dir\build.make tests/CMakeFiles/broker_test.dir/broker_test.cpp.obj
+.PHONY : broker_test.cpp.obj
+
+broker_test.i: broker_test.cpp.i
+.PHONY : broker_test.i
+
+# target to preprocess a source file
+broker_test.cpp.i:
+	cd /d D:\Void\void-vault\build-debug && $(MAKE) $(MAKESILENT) -f tests\CMakeFiles\broker_test.dir\build.make tests/CMakeFiles/broker_test.dir/broker_test.cpp.i
+.PHONY : broker_test.cpp.i
+
+broker_test.s: broker_test.cpp.s
+.PHONY : broker_test.s
+
+# target to generate assembly for a file
+broker_test.cpp.s:
+	cd /d D:\Void\void-vault\build-debug && $(MAKE) $(MAKESILENT) -f tests\CMakeFiles\broker_test.dir\build.make tests/CMakeFiles/broker_test.dir/broker_test.cpp.s
+.PHONY : broker_test.cpp.s
 
 encryption_test.obj: encryption_test.cpp.obj
 .PHONY : encryption_test.obj
@@ -287,12 +325,16 @@ help:
 	@echo ... rebuild_cache
 	@echo ... test
 	@echo ... auth_test
+	@echo ... broker_test
 	@echo ... encryption_test
 	@echo ... storage_test
 	@echo ... vault_test
 	@echo ... auth_test.obj
 	@echo ... auth_test.i
 	@echo ... auth_test.s
+	@echo ... broker_test.obj
+	@echo ... broker_test.i
+	@echo ... broker_test.s
 	@echo ... encryption_test.obj
 	@echo ... encryption_test.i
 	@echo ... encryption_test.s

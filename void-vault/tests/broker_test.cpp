@@ -74,7 +74,10 @@ int main()
 
         // Tamper with token MAC
         std::string tampered = trader_read_token;
-        tampered.back() = (tampered.back() == 'a') ? 'b' : 'a';
+        if (!tampered.empty())
+        {
+            tampered.back() = (tampered.back() == 'a') ? 'b' : 'a';
+        }
         check(!broker.verifyToken(tampered, "void-trader", claims, 1100),
               "Tampered token rejected by HMAC-SHA512256");
 

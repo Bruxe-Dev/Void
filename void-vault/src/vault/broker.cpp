@@ -281,8 +281,9 @@ bool VaultBroker::loadStore(
         }
     }
 
+    const bool ok = (offset == raw.size());
     wipeString(raw);
-    return offset == raw.size();
+    return ok;
 }
 
 bool VaultBroker::saveStore(

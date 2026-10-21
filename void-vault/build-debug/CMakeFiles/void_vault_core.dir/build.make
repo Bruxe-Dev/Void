@@ -86,11 +86,41 @@ CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.s"
 	C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S D:\Void\void-vault\src\vault\vault.cpp -o CMakeFiles\void_vault_core.dir\src\vault\vault.cpp.s
 
+CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj: CMakeFiles/void_vault_core.dir/flags.make
+CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj: CMakeFiles/void_vault_core.dir/includes_CXX.rsp
+CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj: D:/Void/void-vault/src/vault/broker.cpp
+CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj: CMakeFiles/void_vault_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Void\void-vault\build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj"
+	C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj -MF CMakeFiles\void_vault_core.dir\src\vault\broker.cpp.obj.d -o CMakeFiles\void_vault_core.dir\src\vault\broker.cpp.obj -c D:\Void\void-vault\src\vault\broker.cpp
+
+CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.i"
+	C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E D:\Void\void-vault\src\vault\broker.cpp > CMakeFiles\void_vault_core.dir\src\vault\broker.cpp.i
+
+CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.s"
+	C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S D:\Void\void-vault\src\vault\broker.cpp -o CMakeFiles\void_vault_core.dir\src\vault\broker.cpp.s
+
+CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj: CMakeFiles/void_vault_core.dir/flags.make
+CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj: CMakeFiles/void_vault_core.dir/includes_CXX.rsp
+CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj: D:/Void/void-vault/src/vault/void_vault_c.cpp
+CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj: CMakeFiles/void_vault_core.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Void\void-vault\build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj"
+	C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj -MF CMakeFiles\void_vault_core.dir\src\vault\void_vault_c.cpp.obj.d -o CMakeFiles\void_vault_core.dir\src\vault\void_vault_c.cpp.obj -c D:\Void\void-vault\src\vault\void_vault_c.cpp
+
+CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.i"
+	C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E D:\Void\void-vault\src\vault\void_vault_c.cpp > CMakeFiles\void_vault_core.dir\src\vault\void_vault_c.cpp.i
+
+CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.s"
+	C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S D:\Void\void-vault\src\vault\void_vault_c.cpp -o CMakeFiles\void_vault_core.dir\src\vault\void_vault_c.cpp.s
+
 CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj: CMakeFiles/void_vault_core.dir/flags.make
 CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj: CMakeFiles/void_vault_core.dir/includes_CXX.rsp
 CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj: D:/Void/void-vault/src/security/auth.cpp
 CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj: CMakeFiles/void_vault_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Void\void-vault\build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Void\void-vault\build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj"
 	C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj -MF CMakeFiles\void_vault_core.dir\src\security\auth.cpp.obj.d -o CMakeFiles\void_vault_core.dir\src\security\auth.cpp.obj -c D:\Void\void-vault\src\security\auth.cpp
 
 CMakeFiles/void_vault_core.dir/src/security/auth.cpp.i: cmake_force
@@ -105,7 +135,7 @@ CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj: CMakeFiles/void_
 CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj: CMakeFiles/void_vault_core.dir/includes_CXX.rsp
 CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj: D:/Void/void-vault/src/security/encryption.cpp
 CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj: CMakeFiles/void_vault_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Void\void-vault\build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Void\void-vault\build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj"
 	C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj -MF CMakeFiles\void_vault_core.dir\src\security\encryption.cpp.obj.d -o CMakeFiles\void_vault_core.dir\src\security\encryption.cpp.obj -c D:\Void\void-vault\src\security\encryption.cpp
 
 CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.i: cmake_force
@@ -120,7 +150,7 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: CMakeFiles/void_vaul
 CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: CMakeFiles/void_vault_core.dir/includes_CXX.rsp
 CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/src/storage/storage.cpp
 CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: CMakeFiles/void_vault_core.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Void\void-vault\build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=D:\Void\void-vault\build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj"
 	C:\msys64\ucrt64\bin\c++.exe $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj -MF CMakeFiles\void_vault_core.dir\src\storage\storage.cpp.obj.d -o CMakeFiles\void_vault_core.dir\src\storage\storage.cpp.obj -c D:\Void\void-vault\src\storage\storage.cpp
 
 CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.i: cmake_force
@@ -134,6 +164,8 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.s: cmake_force
 # Object files for target void_vault_core
 void_vault_core_OBJECTS = \
 "CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.obj" \
+"CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj" \
+"CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj" \
 "CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj" \
 "CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj" \
 "CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj"
@@ -142,12 +174,14 @@ void_vault_core_OBJECTS = \
 void_vault_core_EXTERNAL_OBJECTS =
 
 libvoid_vault_core.a: CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.obj
+libvoid_vault_core.a: CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj
+libvoid_vault_core.a: CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj
 libvoid_vault_core.a: CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj
 libvoid_vault_core.a: CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj
 libvoid_vault_core.a: CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj
 libvoid_vault_core.a: CMakeFiles/void_vault_core.dir/build.make
 libvoid_vault_core.a: CMakeFiles/void_vault_core.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=D:\Void\void-vault\build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX static library libvoid_vault_core.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=D:\Void\void-vault\build-debug\CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX static library libvoid_vault_core.a"
 	$(CMAKE_COMMAND) -P CMakeFiles\void_vault_core.dir\cmake_clean_target.cmake
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles\void_vault_core.dir\link.txt --verbose=$(VERBOSE)
 

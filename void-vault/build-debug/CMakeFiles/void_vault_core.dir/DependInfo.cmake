@@ -11,7 +11,9 @@ set(CMAKE_DEPENDS_DEPENDENCY_FILES
   "D:/Void/void-vault/src/security/auth.cpp" "CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj" "gcc" "CMakeFiles/void_vault_core.dir/src/security/auth.cpp.obj.d"
   "D:/Void/void-vault/src/security/encryption.cpp" "CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj" "gcc" "CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj.d"
   "D:/Void/void-vault/src/storage/storage.cpp" "CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj" "gcc" "CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj.d"
+  "D:/Void/void-vault/src/vault/broker.cpp" "CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj" "gcc" "CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj.d"
   "D:/Void/void-vault/src/vault/vault.cpp" "CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.obj" "gcc" "CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.obj.d"
+  "D:/Void/void-vault/src/vault/void_vault_c.cpp" "CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj" "gcc" "CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj.d"
   )
 
 # Targets to which this target links which contain Fortran sources.

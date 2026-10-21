@@ -1,10 +1,10 @@
-Start testing: Oct 21 14:32 South Africa Standard Time
+Start testing: Oct 21 15:38 South Africa Standard Time
 ----------------------------------------------------------
-1/5 Testing: storage_test
-1/5 Test: storage_test
+1/6 Testing: storage_test
+1/6 Test: storage_test
 Command: "D:/Void/void-vault/build-debug/tests/storage_test.exe"
 Directory: D:/Void/void-vault/build-debug/tests
-"storage_test" start time: Oct 21 14:32 South Africa Standard Time
+"storage_test" start time: Oct 21 15:38 South Africa Standard Time
 Output:
 ----------------------------------------------------------
 === Storage Tests ===
@@ -35,18 +35,18 @@ PASS: readFile rejects directory paths
 PASS: atomicWrite rejects payload exceeding MAX_FILE_SIZE
 All storage tests passed.
 <end of output>
-Test time =   0.49 sec
+Test time =   0.52 sec
 ----------------------------------------------------------
 Test Passed.
-"storage_test" end time: Oct 21 14:32 South Africa Standard Time
+"storage_test" end time: Oct 21 15:38 South Africa Standard Time
 "storage_test" time elapsed: 00:00:00
 ----------------------------------------------------------
 
-2/5 Testing: auth_test
-2/5 Test: auth_test
+2/6 Testing: auth_test
+2/6 Test: auth_test
 Command: "D:/Void/void-vault/build-debug/tests/auth_test.exe"
 Directory: D:/Void/void-vault/build-debug/tests
-"auth_test" start time: Oct 21 14:32 South Africa Standard Time
+"auth_test" start time: Oct 21 15:38 South Africa Standard Time
 Output:
 ----------------------------------------------------------
 === Authentication Tests ===
@@ -124,18 +124,18 @@ PASS: Old password rejected after rotation
 PASS: New password accepted after restart
 All auth tests passed.
 <end of output>
-Test time =   3.24 sec
+Test time =   4.80 sec
 ----------------------------------------------------------
 Test Passed.
-"auth_test" end time: Oct 21 14:32 South Africa Standard Time
-"auth_test" time elapsed: 00:00:03
+"auth_test" end time: Oct 21 15:38 South Africa Standard Time
+"auth_test" time elapsed: 00:00:04
 ----------------------------------------------------------
 
-3/5 Testing: encryption_test
-3/5 Test: encryption_test
+3/6 Testing: encryption_test
+3/6 Test: encryption_test
 Command: "D:/Void/void-vault/build-debug/tests/encryption_test.exe"
 Directory: D:/Void/void-vault/build-debug/tests
-"encryption_test" start time: Oct 21 14:32 South Africa Standard Time
+"encryption_test" start time: Oct 21 15:38 South Africa Standard Time
 Output:
 ----------------------------------------------------------
 === Encryption Tests ===
@@ -181,18 +181,18 @@ PASS: 1 MiB plaintext round trip
 PASS: UTF-8 password round trip
 All encryption tests passed.
 <end of output>
-Test time =   4.87 sec
+Test time =   8.48 sec
 ----------------------------------------------------------
 Test Passed.
-"encryption_test" end time: Oct 21 14:32 South Africa Standard Time
-"encryption_test" time elapsed: 00:00:04
+"encryption_test" end time: Oct 21 15:38 South Africa Standard Time
+"encryption_test" time elapsed: 00:00:08
 ----------------------------------------------------------
 
-4/5 Testing: vault_test
-4/5 Test: vault_test
+4/6 Testing: vault_test
+4/6 Test: vault_test
 Command: "D:/Void/void-vault/build-debug/tests/vault_test.exe"
 Directory: D:/Void/void-vault/build-debug/tests
-"vault_test" start time: Oct 21 14:32 South Africa Standard Time
+"vault_test" start time: Oct 21 15:38 South Africa Standard Time
 Output:
 ----------------------------------------------------------
 === Vault Integration Tests ===
@@ -245,27 +245,77 @@ PASS: New password unlocks after restart
 PASS: Re-encrypted data persists across restart
 All vault tests passed.
 <end of output>
-Test time =   4.65 sec
+Test time =   6.62 sec
 ----------------------------------------------------------
 Test Passed.
-"vault_test" end time: Oct 21 14:32 South Africa Standard Time
-"vault_test" time elapsed: 00:00:04
+"vault_test" end time: Oct 21 15:38 South Africa Standard Time
+"vault_test" time elapsed: 00:00:06
 ----------------------------------------------------------
 
-5/5 Testing: app_e2e_test
-5/5 Test: app_e2e_test
-Command: "C:/Program Files/CMake/bin/cmake.exe" "-DAPP=D:/Void/void-vault/build-debug/void_vault.exe" "-DWORK_DIR=D:/Void/void-vault/build-debug/tests/e2e_data" "-P" "D:/Void/void-vault/tests/app_e2e_test.cmake"
+5/6 Testing: broker_test
+5/6 Test: broker_test
+Command: "D:/Void/void-vault/build-debug/tests/broker_test.exe"
 Directory: D:/Void/void-vault/build-debug/tests
-"app_e2e_test" start time: Oct 21 14:32 South Africa Standard Time
+"broker_test" start time: Oct 21 15:38 South Africa Standard Time
 Output:
 ----------------------------------------------------------
--- app_e2e_test passed
+=== VaultBroker & Delegated Capability Token Tests ===
+PASS: Master password setup
+PASS: setSecret rejected while vault is locked
+PASS: Vault unlocked
+PASS: Save trader.mt5_login
+FAIL: Save trader.mt5_password
+FAIL: Save medical.patient_id
+PASS: Reserved prefix __vv_ rejected
+PASS: Key with whitespace rejected
+PASS: Key names are hidden inside AEAD ciphertext on disk
+PASS: Secret values are hidden inside AEAD ciphertext on disk
+FAIL: listKeys returns 3 user keys (internal broker key hidden)
+FAIL: getSecret retrieves exact value
+FAIL: Overwrite existing key
+FAIL: Updated value retrieved
+PASS: Unlock after restart
+FAIL: Issue read:trader.* token for void-trader
+FAIL: verifyToken succeeds within TTL for matching app_id
+C:/msys64/ucrt64/include/c++/15.2.0/bits/basic_string.h:1452: constexpr std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::reference std::__cxx11::basic_string<_CharT, _Traits, _Alloc>::back() [with _CharT = char; _Traits = std::char_traits<char>; _Alloc = std::allocator<char>; reference = char&]: Assertion '!empty()' failed.
 <end of output>
-Test time =   2.81 sec
+Test time =  18.11 sec
 ----------------------------------------------------------
-Test Passed.
-"app_e2e_test" end time: Oct 21 14:32 South Africa Standard Time
-"app_e2e_test" time elapsed: 00:00:02
+Test Failed.
+"broker_test" end time: Oct 21 15:38 South Africa Standard Time
+"broker_test" time elapsed: 00:00:18
 ----------------------------------------------------------
 
-End testing: Oct 21 14:32 South Africa Standard Time
+6/6 Testing: app_e2e_test
+6/6 Test: app_e2e_test
+Command: "C:/Program Files/CMake/bin/cmake.exe" "-DAPP=D:/Void/void-vault/build-debug/void_vault.exe" "-DWORK_DIR=D:/Void/void-vault/build-debug/tests/e2e_data" "-P" "D:/Void/void-vault/tests/app_e2e_test.cmake"
+Directory: D:/Void/void-vault/build-debug/tests
+"app_e2e_test" start time: Oct 21 15:38 South Africa Standard Time
+Output:
+----------------------------------------------------------
+CMake Error at D:/Void/void-vault/tests/app_e2e_test.cmake:108 (message):
+  broker output missing expected responses:
+
+  OK initialized
+
+  OK unlocked
+
+  OK saved
+
+  ERR issue_token_failed
+
+  ERR unknown_command
+
+  OK bye
+
+
+
+<end of output>
+Test time =   4.88 sec
+----------------------------------------------------------
+Test Failed.
+"app_e2e_test" end time: Oct 21 15:38 South Africa Standard Time
+"app_e2e_test" time elapsed: 00:00:04
+----------------------------------------------------------
+
+End testing: Oct 21 15:38 South Africa Standard Time

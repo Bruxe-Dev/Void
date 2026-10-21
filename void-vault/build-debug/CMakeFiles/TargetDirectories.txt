@@ -7,6 +7,7 @@ D:/Void/void-vault/build-debug/tests/CMakeFiles/storage_test.dir
 D:/Void/void-vault/build-debug/tests/CMakeFiles/auth_test.dir
 D:/Void/void-vault/build-debug/tests/CMakeFiles/encryption_test.dir
 D:/Void/void-vault/build-debug/tests/CMakeFiles/vault_test.dir
+D:/Void/void-vault/build-debug/tests/CMakeFiles/broker_test.dir
 D:/Void/void-vault/build-debug/tests/CMakeFiles/test.dir
 D:/Void/void-vault/build-debug/tests/CMakeFiles/edit_cache.dir
 D:/Void/void-vault/build-debug/tests/CMakeFiles/rebuild_cache.dir

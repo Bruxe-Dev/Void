@@ -147,6 +147,63 @@ Run a single test target:
 6. **`5) status`**: Displays lock state, failed-attempt count (`n/5`), and whether `vault_data.dat` exists.
 7. **`6) quit`**: Wipes session secrets, releases the session lock, and exits cleanly (`0`).
 8. **`7) change password`**: Atomically rotates the account password and re-encrypts `vault_data.dat` under the new key.
+9. **`8) secrets`**: Manage multiple named key-value secrets (`set`, `get`, `del`, `list`) inside the encrypted container (`VVKV1`).
+10. **`9) app token`**: Issue a scoped, short-lived **"Sign in with Void Vault"** capability token (`VVTOK1...`) for an external application/module.
+
+---
+
+## Embedding Void Vault & "Sign in with Void Vault" (Developer Guide)
+
+Void Vault is designed so third-party applications (trading systems, healthcare tools, AI agents, desktop apps, and local services) can let the **end-user own and control their secrets locally** while granting applications **scoped, time-bounded capability tokens (`VVTOK1`)** or **isolated 256-bit cryptographic subkeys**—without ever exposing the user's master password to the application.
+
+### 1. Scoped Capability Tokens (`VVTOK1`) — Local OAuth-Style Authorization
+
+When an application requests access, Void Vault issues an `HMAC-SHA512256`-authenticated token:
+```text
+VVTOK1.<hex(issued_at || expires_at || app_id || scope)>.<hex(hmac_sha512256)>
+```
+Supported scopes:
+- `*` — Full read/write access to all named secrets.
+- `read:*` — Read-only access to all named secrets.
+- `read:<prefix>*` (e.g. `read:trader.*`) — Read-only access to secrets starting with `<prefix>`.
+- `write:<prefix>*` (e.g. `write:trader.*`) — Read + write access to secrets starting with `<prefix>`.
+- `key:<exact_key>` / `read_key:<exact_key>` — Access restricted to a single secret key.
+- `auth:only` — Identity verification and zero-knowledge app subkey derivation only (zero secret read/write access).
+
+### 2. Three Ways to Integrate Void Vault into Your Application
+
+#### A. Python SDK (`sdk/python/void_vault.py`) & `--broker` IPC Pipe
+Any language can spawn `void_vault --data-dir <dir> --broker` over stdin/stdout pipes. In Python:
+
+```python
+from sdk.python.void_vault import VoidVaultClient
+
+with VoidVaultClient("build/void_vault.exe", data_dir="./vault_data") as vault:
+    # 1. User unlocks their vault (master password stays inside Void Vault)
+    vault.unlock("UserMasterPassword123!")
+    vault.set_secret("trader.mt5_password", "BrokerSecret#99")
+    vault.set_secret("personal.medical_note", "PrivateRecord")
+
+    # 2. Issue a scoped "Sign in with Void Vault" token for the 'void-trader' module
+    token = vault.issue_token(app_id="void-trader", scope="read:trader.*", ttl_seconds=300)
+
+    # 3. The 'void-trader' module can read 'trader.*' secrets, but is blocked from 'personal.*'
+    mt5_pw = vault.get_secret_with_token(token, app_id="void-trader", key="trader.mt5_password")
+
+    # 4. Or derive a deterministic 256-bit encryption key isolated to 'void-trader'
+    app_encryption_key: bytes = vault.derive_app_key(token, app_id="void-trader", subkey_id=1)
+```
+
+#### B. Universal C ABI (`include/void_vault_c.h`)
+For C, Rust, Go, Node.js FFI, C# P/Invoke, or MetaTrader 5 (MQL5) DLL integration, include [`include/void_vault_c.h`](include/void_vault_c.h):
+- `vv_open`, `vv_close`, `vv_setup_password`, `vv_unlock`, `vv_lock`
+- `vv_set_secret`, `vv_get_secret`
+- `vv_issue_token`, `vv_verify_token`, `vv_get_secret_with_token`, `vv_set_secret_with_token`, `vv_derive_app_key`
+
+#### C. Native C++20 Library (`void_vault_core`)
+Link against `void_vault_core` in CMake and include [`src/vault/broker.hpp`](src/vault/broker.hpp) (`VaultBroker`).
+
+---
 
 ### Exit Codes
 

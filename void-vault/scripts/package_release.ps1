@@ -39,6 +39,11 @@ try {
     Copy-Item (Join-Path $root "SECURITY.md") $stageDir -Force
     Copy-Item (Join-Path $root "LICENSE")     $stageDir -Force
 
+    New-Item -ItemType Directory -Force -Path (Join-Path $stageDir "include") | Out-Null
+    New-Item -ItemType Directory -Force -Path (Join-Path $stageDir "sdk\python") | Out-Null
+    Copy-Item (Join-Path $root "include\void_vault_c.h")       (Join-Path $stageDir "include\void_vault_c.h") -Force
+    Copy-Item (Join-Path $root "sdk\python\void_vault.py")     (Join-Path $stageDir "sdk\python\void_vault.py") -Force
+
     Write-Host "[3/4] Creating release archive $zipPath ..."
     Compress-Archive -Path "$stageDir\*" -DestinationPath $zipPath -Force
 

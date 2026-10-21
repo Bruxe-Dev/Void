@@ -83,5 +83,30 @@ if(NOT after STREQUAL "corrupted")
     message(FATAL_ERROR "corrupted auth file was modified")
 endif()
 
+# Run 6: --broker IPC mode (SETUP, UNLOCK, SET_SECRET, ISSUE_TOKEN, VERIFY_TOKEN, DERIVE_APP_KEY, QUIT).
+file(REMOVE "${WORK_DIR}/vault_auth.dat" "${WORK_DIR}/vault_data.dat")
+string(HEX "${PW}" pw_hex)
+string(HEX "mt5-api-key-999" val_hex)
+string(TOLOWER "${val_hex}" val_hex)
+file(WRITE "${WORK_DIR}/broker.in"
+    "SETUP ${pw_hex}\nUNLOCK ${pw_hex}\nSET_SECRET trader.api_key ${val_hex}\nISSUE_TOKEN void-trader read:trader.* 300\nDERIVE_APP_KEYnotok void-trader 1\nQUIT\n")
+execute_process(
+    COMMAND "${APP}" --data-dir "${WORK_DIR}" --broker
+    INPUT_FILE "${WORK_DIR}/broker.in"
+    OUTPUT_VARIABLE broker_out
+    ERROR_VARIABLE broker_err
+    RESULT_VARIABLE broker_rc
+    TIMEOUT 120)
+if(NOT broker_rc EQUAL 0)
+    message(FATAL_ERROR "broker run failed: ${broker_rc}\n${broker_out}${broker_err}")
+endif()
+string(FIND "${broker_out}" "OK initialized" b1)
+string(FIND "${broker_out}" "OK unlocked" b2)
+string(FIND "${broker_out}" "OK saved" b3)
+string(FIND "${broker_out}" "OK VVTOK1." b4)
+if(b1 EQUAL -1 OR b2 EQUAL -1 OR b3 EQUAL -1 OR b4 EQUAL -1)
+    message(FATAL_ERROR "broker output missing expected responses:\n${broker_out}")
+endif()
+
 file(REMOVE_RECURSE "${WORK_DIR}")
 message(STATUS "app_e2e_test passed")

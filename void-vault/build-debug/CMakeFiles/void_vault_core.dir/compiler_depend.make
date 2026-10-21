@@ -330,6 +330,7 @@ CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj: D:/Void/void-vau
   C:/msys64/ucrt64/include/c++/15.2.0/cstddef \
   C:/msys64/ucrt64/include/c++/15.2.0/cstdio \
   C:/msys64/ucrt64/include/c++/15.2.0/cstdlib \
+  C:/msys64/ucrt64/include/c++/15.2.0/cstring \
   C:/msys64/ucrt64/include/c++/15.2.0/cwchar \
   C:/msys64/ucrt64/include/c++/15.2.0/debug/assertions.h \
   C:/msys64/ucrt64/include/c++/15.2.0/debug/debug.h \
@@ -370,6 +371,7 @@ CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj: D:/Void/void-vau
   C:/msys64/ucrt64/include/sdks/_mingw_ddk.h \
   C:/msys64/ucrt64/include/sec_api/stdio_s.h \
   C:/msys64/ucrt64/include/sec_api/stdlib_s.h \
+  C:/msys64/ucrt64/include/sec_api/string_s.h \
   C:/msys64/ucrt64/include/sec_api/wchar_s.h \
   C:/msys64/ucrt64/include/sodium.h \
   C:/msys64/ucrt64/include/sodium/core.h \
@@ -441,6 +443,7 @@ CMakeFiles/void_vault_core.dir/src/security/encryption.cpp.obj: D:/Void/void-vau
   C:/msys64/ucrt64/include/stdint.h \
   C:/msys64/ucrt64/include/stdio.h \
   C:/msys64/ucrt64/include/stdlib.h \
+  C:/msys64/ucrt64/include/string.h \
   C:/msys64/ucrt64/include/swprintf.inl \
   C:/msys64/ucrt64/include/sys/types.h \
   C:/msys64/ucrt64/include/vadefs.h \
@@ -461,6 +464,8 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/_mingw_stdarg.h \
   C:/msys64/ucrt64/include/_mingw_unicode.h \
   C:/msys64/ucrt64/include/_timeval.h \
+  C:/msys64/ucrt64/include/accctrl.h \
+  C:/msys64/ucrt64/include/aclapi.h \
   C:/msys64/ucrt64/include/apiset.h \
   C:/msys64/ucrt64/include/apisetcconv.h \
   C:/msys64/ucrt64/include/basetsd.h \
@@ -531,6 +536,7 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/c++/15.2.0/bits/sstream.tcc \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/std_abs.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_algobase.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_bvector.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_construct.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_function.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_iterator.h \
@@ -538,6 +544,7 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_iterator_base_types.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_pair.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_uninitialized.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_vector.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stream_iterator.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf.tcc \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf_iterator.h \
@@ -547,6 +554,7 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator_args.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/utility.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/vector.tcc \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/version.h \
   C:/msys64/ucrt64/include/c++/15.2.0/cctype \
   C:/msys64/ucrt64/include/c++/15.2.0/cerrno \
@@ -596,6 +604,7 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/c++/15.2.0/tuple \
   C:/msys64/ucrt64/include/c++/15.2.0/type_traits \
   C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
+  C:/msys64/ucrt64/include/c++/15.2.0/vector \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/basic_file.h \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
@@ -611,6 +620,8 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/messages_members.h \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/os_defines.h \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/time_members.h \
+  C:/msys64/ucrt64/include/cguid.h \
+  C:/msys64/ucrt64/include/combaseapi.h \
   C:/msys64/ucrt64/include/concurrencysal.h \
   C:/msys64/ucrt64/include/consoleapi.h \
   C:/msys64/ucrt64/include/consoleapi2.h \
@@ -647,14 +658,23 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/memoryapi.h \
   C:/msys64/ucrt64/include/minwinbase.h \
   C:/msys64/ucrt64/include/minwindef.h \
+  C:/msys64/ucrt64/include/msxml.h \
   C:/msys64/ucrt64/include/namedpipeapi.h \
   C:/msys64/ucrt64/include/namespaceapi.h \
+  C:/msys64/ucrt64/include/oaidl.h \
+  C:/msys64/ucrt64/include/objbase.h \
+  C:/msys64/ucrt64/include/objidl.h \
+  C:/msys64/ucrt64/include/objidlbase.h \
+  C:/msys64/ucrt64/include/ole2.h \
+  C:/msys64/ucrt64/include/oleauto.h \
+  C:/msys64/ucrt64/include/oleidl.h \
   C:/msys64/ucrt64/include/poppack.h \
   C:/msys64/ucrt64/include/process.h \
   C:/msys64/ucrt64/include/processenv.h \
   C:/msys64/ucrt64/include/processthreadsapi.h \
   C:/msys64/ucrt64/include/processtopologyapi.h \
   C:/msys64/ucrt64/include/profileapi.h \
+  C:/msys64/ucrt64/include/propidl.h \
   C:/msys64/ucrt64/include/psdk_inc/intrin-impl.h \
   C:/msys64/ucrt64/include/pshpack1.h \
   C:/msys64/ucrt64/include/pshpack2.h \
@@ -667,6 +687,15 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/pthread_unistd.h \
   C:/msys64/ucrt64/include/realtimeapiset.h \
   C:/msys64/ucrt64/include/reason.h \
+  C:/msys64/ucrt64/include/rpc.h \
+  C:/msys64/ucrt64/include/rpcasync.h \
+  C:/msys64/ucrt64/include/rpcdce.h \
+  C:/msys64/ucrt64/include/rpcdcep.h \
+  C:/msys64/ucrt64/include/rpcndr.h \
+  C:/msys64/ucrt64/include/rpcnsi.h \
+  C:/msys64/ucrt64/include/rpcnsip.h \
+  C:/msys64/ucrt64/include/rpcnterr.h \
+  C:/msys64/ucrt64/include/rpcsal.h \
   C:/msys64/ucrt64/include/sal.h \
   C:/msys64/ucrt64/include/sched.h \
   C:/msys64/ucrt64/include/sdkddkver.h \
@@ -679,6 +708,7 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/sec_api/wchar_s.h \
   C:/msys64/ucrt64/include/securityappcontainer.h \
   C:/msys64/ucrt64/include/securitybaseapi.h \
+  C:/msys64/ucrt64/include/servprov.h \
   C:/msys64/ucrt64/include/signal.h \
   C:/msys64/ucrt64/include/specstrings.h \
   C:/msys64/ucrt64/include/stdarg.h \
@@ -700,6 +730,9 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/time.h \
   C:/msys64/ucrt64/include/timezoneapi.h \
   C:/msys64/ucrt64/include/tvout.h \
+  C:/msys64/ucrt64/include/unknwn.h \
+  C:/msys64/ucrt64/include/unknwnbase.h \
+  C:/msys64/ucrt64/include/urlmon.h \
   C:/msys64/ucrt64/include/utilapiset.h \
   C:/msys64/ucrt64/include/vadefs.h \
   C:/msys64/ucrt64/include/virtdisk.h \
@@ -722,6 +755,8 @@ CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.obj: D:/Void/void-vault/s
   C:/msys64/ucrt64/include/winver.h \
   C:/msys64/ucrt64/include/wnnc.h \
   C:/msys64/ucrt64/include/wow64apiset.h \
+  C:/msys64/ucrt64/include/wtypes.h \
+  C:/msys64/ucrt64/include/wtypesbase.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/adxintrin.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/ammintrin.h \
   C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/amxavx512intrin.h \
@@ -864,8 +899,10 @@ CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.obj: D:/Void/void-vault/src/v
   C:/msys64/ucrt64/include/c++/15.2.0/bits/concept_check.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/cpp_type_traits.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_forced.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/cxxabi_init_exception.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/exception.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_defines.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/exception_ptr.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/functexcept.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/functional_hash.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/hash_bytes.h \
@@ -876,6 +913,7 @@ CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.obj: D:/Void/void-vault/src/v
   C:/msys64/ucrt64/include/c++/15.2.0/bits/memory_resource.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/memoryfwd.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/move.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/nested_exception.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/new_allocator.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream_insert.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/postypes.h \
@@ -914,6 +952,7 @@ CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.obj: D:/Void/void-vault/src/v
   C:/msys64/ucrt64/include/c++/15.2.0/cwchar \
   C:/msys64/ucrt64/include/c++/15.2.0/debug/assertions.h \
   C:/msys64/ucrt64/include/c++/15.2.0/debug/debug.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/exception \
   C:/msys64/ucrt64/include/c++/15.2.0/ext/alloc_traits.h \
   C:/msys64/ucrt64/include/c++/15.2.0/ext/numeric_traits.h \
   C:/msys64/ucrt64/include/c++/15.2.0/ext/string_conversions.h \
@@ -923,11 +962,13 @@ CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.obj: D:/Void/void-vault/src/v
   C:/msys64/ucrt64/include/c++/15.2.0/new \
   C:/msys64/ucrt64/include/c++/15.2.0/numbers \
   C:/msys64/ucrt64/include/c++/15.2.0/pstl/pstl_config.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/stdexcept \
   C:/msys64/ucrt64/include/c++/15.2.0/stdlib.h \
   C:/msys64/ucrt64/include/c++/15.2.0/string \
   C:/msys64/ucrt64/include/c++/15.2.0/string_view \
   C:/msys64/ucrt64/include/c++/15.2.0/tuple \
   C:/msys64/ucrt64/include/c++/15.2.0/type_traits \
+  C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
   C:/msys64/ucrt64/include/c++/15.2.0/utility \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++config.h \
@@ -1208,6 +1249,8 @@ C:/msys64/ucrt64/include/c++/15.2.0/bits/ptr_traits.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/bits/functional_hash.h:
 
+C:/msys64/ucrt64/include/unknwnbase.h:
+
 C:/msys64/ucrt64/include/c++/15.2.0/bits/invoke.h:
 
 C:/msys64/ucrt64/include/stdarg.h:
@@ -1268,9 +1311,13 @@ C:/msys64/ucrt64/include/c++/15.2.0/bits/ranges_util.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/enqcmdintrin.h:
 
+C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_vector.h:
+
 C:/msys64/ucrt64/include/c++/15.2.0/bits/refwrap.h:
 
 C:/msys64/ucrt64/include/wingdi.h:
+
+C:/msys64/ucrt64/include/objidl.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/bits/requires_hosted.h:
 
@@ -1468,6 +1515,8 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/xtestintrin.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/tuple:
 
+C:/msys64/ucrt64/include/rpcndr.h:
+
 C:/msys64/ucrt64/include/sodium/crypto_stream_chacha20.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/type_traits:
@@ -1502,6 +1551,8 @@ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/error_constants.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/sm4intrin.h:
 
+C:/msys64/ucrt64/include/unknwn.h:
+
 C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr-default.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h:
@@ -1509,6 +1560,8 @@ C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/gthr.h:
 C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/os_defines.h:
 
 C:/msys64/ucrt64/include/winerror.h:
+
+C:/msys64/ucrt64/include/rpcnterr.h:
 
 C:/msys64/ucrt64/include/sodium/crypto_core_salsa20.h:
 
@@ -1519,6 +1572,8 @@ C:/msys64/ucrt64/include/sodium/crypto_auth_hmacsha512256.h:
 C:/msys64/ucrt64/include/ctype.h:
 
 C:/msys64/ucrt64/include/corecrt_wctype.h:
+
+C:/msys64/ucrt64/include/ole2.h:
 
 C:/msys64/ucrt64/include/stdlib.h:
 
@@ -1580,6 +1635,8 @@ C:/msys64/ucrt64/include/sodium/crypto_pwhash_scryptsalsa208sha256.h:
 
 C:/msys64/ucrt64/include/sodium/crypto_aead_aegis128l.h:
 
+C:/msys64/ucrt64/include/wtypes.h:
+
 C:/msys64/ucrt64/include/sodium/crypto_aead_aegis256.h:
 
 C:/msys64/ucrt64/include/sodium/crypto_aead_chacha20poly1305.h:
@@ -1637,6 +1694,8 @@ C:/msys64/ucrt64/include/sodium/crypto_scalarmult_curve25519.h:
 C:/msys64/ucrt64/include/sodium/crypto_scalarmult_ristretto255.h:
 
 C:/msys64/ucrt64/include/sodium/crypto_secretbox_xchacha20poly1305.h:
+
+C:/msys64/ucrt64/include/rpc.h:
 
 C:/msys64/ucrt64/include/sodium/crypto_stream_xchacha20.h:
 
@@ -1722,11 +1781,29 @@ C:/msys64/ucrt64/include/c++/15.2.0/bits/uniform_int_dist.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/pstl/glue_algorithm_defs.h:
 
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx10_2minmaxintrin.h:
+
+C:/msys64/ucrt64/include/libloaderapi.h:
+
+C:/msys64/ucrt64/include/sec_api/string_s.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/uintrintrin.h:
+
+C:/msys64/ucrt64/include/concurrencysal.h:
+
+C:/msys64/ucrt64/include/string.h:
+
 D:/Void/void-vault/src/security/encryption.hpp:
 
 C:/msys64/ucrt64/include/_mingw_stdarg.h:
 
 C:/msys64/ucrt64/include/_mingw_unicode.h:
+
+C:/msys64/ucrt64/include/accctrl.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/lwpintrin.h:
+
+C:/msys64/ucrt64/include/aclapi.h:
 
 C:/msys64/ucrt64/include/consoleapi3.h:
 
@@ -1738,17 +1815,25 @@ C:/msys64/ucrt64/include/basetsd.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/bits/fstream.tcc:
 
+C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_bvector.h:
+
+C:/msys64/ucrt64/include/c++/15.2.0/bits/vector.tcc:
+
 C:/msys64/ucrt64/include/c++/15.2.0/fstream:
 
 C:/msys64/ucrt64/include/c++/15.2.0/iterator:
 
+C:/msys64/ucrt64/include/c++/15.2.0/vector:
+
 C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/basic_file.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/uintrintrin.h:
+D:/Void/void-vault/src/vault/vault.cpp:
 
-C:/msys64/ucrt64/include/string.h:
+C:/msys64/ucrt64/include/cguid.h:
 
-C:/msys64/ucrt64/include/concurrencysal.h:
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/amxtransposeintrin.h:
+
+C:/msys64/ucrt64/include/combaseapi.h:
 
 C:/msys64/ucrt64/include/consoleapi.h:
 
@@ -1778,15 +1863,25 @@ C:/msys64/ucrt64/include/ioapiset.h:
 
 C:/msys64/ucrt64/include/jobapi.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx10_2minmaxintrin.h:
-
-C:/msys64/ucrt64/include/sec_api/string_s.h:
-
-C:/msys64/ucrt64/include/libloaderapi.h:
-
 C:/msys64/ucrt64/include/minwinbase.h:
 
 C:/msys64/ucrt64/include/minwindef.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/tmmintrin.h:
+
+C:/msys64/ucrt64/include/msxml.h:
+
+C:/msys64/ucrt64/include/oaidl.h:
+
+C:/msys64/ucrt64/include/objbase.h:
+
+C:/msys64/ucrt64/include/objidlbase.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/x86intrin.h:
+
+C:/msys64/ucrt64/include/oleauto.h:
+
+C:/msys64/ucrt64/include/oleidl.h:
 
 C:/msys64/ucrt64/include/poppack.h:
 
@@ -1802,7 +1897,11 @@ C:/msys64/ucrt64/include/processtopologyapi.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512ifmaintrin.h:
 
+C:/msys64/ucrt64/include/rpcnsi.h:
+
 C:/msys64/ucrt64/include/profileapi.h:
+
+C:/msys64/ucrt64/include/propidl.h:
 
 C:/msys64/ucrt64/include/psdk_inc/intrin-impl.h:
 
@@ -1816,6 +1915,18 @@ C:/msys64/ucrt64/include/pshpack8.h:
 
 C:/msys64/ucrt64/include/reason.h:
 
+C:/msys64/ucrt64/include/rpcasync.h:
+
+C:/msys64/ucrt64/include/rpcdce.h:
+
+C:/msys64/ucrt64/include/rpcdcep.h:
+
+C:/msys64/ucrt64/include/rpcnsip.h:
+
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512dqintrin.h:
+
+C:/msys64/ucrt64/include/rpcsal.h:
+
 C:/msys64/ucrt64/include/sal.h:
 
 C:/msys64/ucrt64/include/sdkddkver.h:
@@ -1823,6 +1934,8 @@ C:/msys64/ucrt64/include/sdkddkver.h:
 C:/msys64/ucrt64/include/sec_api/stralign_s.h:
 
 C:/msys64/ucrt64/include/securityappcontainer.h:
+
+C:/msys64/ucrt64/include/servprov.h:
 
 C:/msys64/ucrt64/include/stralign.h:
 
@@ -1839,6 +1952,8 @@ C:/msys64/ucrt64/include/sysinfoapi.h:
 C:/msys64/ucrt64/include/threadpoollegacyapiset.h:
 
 C:/msys64/ucrt64/include/tvout.h:
+
+C:/msys64/ucrt64/include/urlmon.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avxvnniint8intrin.h:
 
@@ -1872,6 +1987,10 @@ C:/msys64/ucrt64/include/winver.h:
 
 C:/msys64/ucrt64/include/wow64apiset.h:
 
+C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512vlbwintrin.h:
+
+C:/msys64/ucrt64/include/wtypesbase.h:
+
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/amxavx512intrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/pkuintrin.h:
@@ -1881,8 +2000,6 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/amxcomplexintrin.h:
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/amxint8intrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/amxtf32intrin.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/amxtransposeintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx10_2-512bf16intrin.h:
 
@@ -1900,15 +2017,11 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512bitalgintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512bitalgvlintrin.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512dqintrin.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512fintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512fp16vlintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512ifmavlintrin.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512vlbwintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/bmi2intrin.h:
 
@@ -1937,8 +2050,6 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/gfniintrin.h:
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/hresetintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/keylockerintrin.h:
-
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/lwpintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/mmintrin.h:
 
@@ -1970,8 +2081,6 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/shaintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/tbmintrin.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/tmmintrin.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/usermsrintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/vpclmulqdqintrin.h:
@@ -1980,15 +2089,11 @@ C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/wbnoinvdintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/wmmintrin.h:
 
-C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/x86intrin.h:
-
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/xopintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/xsavecintrin.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/xsavesintrin.h:
-
-D:/Void/void-vault/src/vault/vault.cpp:
 
 C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_relops.h:
 

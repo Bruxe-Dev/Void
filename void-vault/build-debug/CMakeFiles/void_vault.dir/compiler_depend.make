@@ -462,6 +462,8 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: D:/Void/void-vault/src/main.cpp \
   D:/Void/void-vault/src/security/encryption.hpp \
   D:/Void/void-vault/src/security/secure_buffer.hpp \
   D:/Void/void-vault/src/security/auth.hpp \
+  D:/Void/void-vault/src/security/encryption.hpp \
+  D:/Void/void-vault/src/security/process_hardening.hpp \
   D:/Void/void-vault/src/security/secure_buffer.hpp \
   D:/Void/void-vault/src/vault/vault.hpp
 
@@ -1169,6 +1171,8 @@ C:/msys64/ucrt64/include/sodium/crypto_shorthash.h:
 C:/msys64/ucrt64/include/sodium/crypto_shorthash_siphash24.h:
 
 C:/msys64/ucrt64/include/sodium/crypto_sign.h:
+
+D:/Void/void-vault/src/security/process_hardening.hpp:
 
 C:/msys64/ucrt64/include/sodium/crypto_stream_salsa20.h:
 

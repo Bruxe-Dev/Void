@@ -1,6 +1,9 @@
-storage_test 2 0.243889
-auth_test 2 1.61861
-encryption_test 2 2.43565
-vault_test 2 2.32675
-app_e2e_test 2 1.40438
+storage_test 3 0.17266
+auth_test 3 1.59839
+encryption_test 3 2.82512
+vault_test 3 2.20746
+app_e2e_test 2 0
+broker_test 0 0
 ---
+broker_test
+app_e2e_test

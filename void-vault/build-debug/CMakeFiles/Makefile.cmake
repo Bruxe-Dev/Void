@@ -68,4 +68,5 @@ set(CMAKE_DEPEND_INFO_FILES
   "tests/CMakeFiles/auth_test.dir/DependInfo.cmake"
   "tests/CMakeFiles/encryption_test.dir/DependInfo.cmake"
   "tests/CMakeFiles/vault_test.dir/DependInfo.cmake"
+  "tests/CMakeFiles/broker_test.dir/DependInfo.cmake"
   )

@@ -146,6 +146,13 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/ostream.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/istream \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/istream.tcc \
+ C:/msys64/ucrt64/include/c++/15.2.0/sstream \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/sstream.tcc \
+ C:/msys64/ucrt64/include/c++/15.2.0/vector \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_uninitialized.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_vector.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_bvector.h \
+ C:/msys64/ucrt64/include/c++/15.2.0/bits/vector.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/filesystem \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_fwd.h \
  C:/msys64/ucrt64/include/c++/15.2.0/cstdint \
@@ -166,8 +173,6 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/locale_conv.h \
  C:/msys64/ucrt64/include/c++/15.2.0/iomanip \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/quoted_string.h \
- C:/msys64/ucrt64/include/c++/15.2.0/sstream \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/sstream.tcc \
  C:/msys64/ucrt64/include/c++/15.2.0/codecvt \
  C:/msys64/ucrt64/include/c++/15.2.0/ext/concurrence.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/shared_ptr.h \
@@ -176,7 +181,6 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/unique_ptr.h \
  C:/msys64/ucrt64/include/c++/15.2.0/ext/aligned_buffer.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/align.h \
- C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_uninitialized.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_dir.h \
  C:/msys64/ucrt64/include/c++/15.2.0/bits/fs_ops.h \
  C:/msys64/ucrt64/include/sodium.h \
@@ -453,9 +457,11 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: \
  C:/msys64/ucrt64/include/imm.h \
  D:\Void\void-vault\src\security/secure_buffer.hpp \
  C:/msys64/ucrt64/include/c++/15.2.0/cstring \
+ D:\Void\void-vault\src\vault/broker.hpp \
  D:\Void\void-vault\src\vault/vault.hpp \
  D:/Void/void-vault/src/security/auth.hpp \
  D:/Void/void-vault/src/security/encryption.hpp \
  D:/Void/void-vault/src/security/secure_buffer.hpp \
  D:/Void/void-vault/include/storage.hpp \
+ D:\Void\void-vault\src\vault/vault.hpp \
  D:/Void/void-vault/include/storage.hpp C:/msys64/ucrt64/include/io.h

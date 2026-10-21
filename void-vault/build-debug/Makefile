@@ -203,6 +203,19 @@ vault_test/fast:
 	$(MAKE) $(MAKESILENT) -f tests\CMakeFiles\vault_test.dir\build.make tests/CMakeFiles/vault_test.dir/build
 .PHONY : vault_test/fast
 
+#=============================================================================
+# Target rules for targets named broker_test
+
+# Build rule for target.
+broker_test: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\Makefile2 broker_test
+.PHONY : broker_test
+
+# fast build rule for target.
+broker_test/fast:
+	$(MAKE) $(MAKESILENT) -f tests\CMakeFiles\broker_test.dir\build.make tests/CMakeFiles/broker_test.dir/build
+.PHONY : broker_test/fast
+
 src/main.obj: src/main.cpp.obj
 .PHONY : src/main.obj
 
@@ -299,6 +312,30 @@ src/storage/storage.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\void_vault_core.dir\build.make CMakeFiles/void_vault_core.dir/src/storage/storage.cpp.s
 .PHONY : src/storage/storage.cpp.s
 
+src/vault/broker.obj: src/vault/broker.cpp.obj
+.PHONY : src/vault/broker.obj
+
+# target to build an object file
+src/vault/broker.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\void_vault_core.dir\build.make CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.obj
+.PHONY : src/vault/broker.cpp.obj
+
+src/vault/broker.i: src/vault/broker.cpp.i
+.PHONY : src/vault/broker.i
+
+# target to preprocess a source file
+src/vault/broker.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\void_vault_core.dir\build.make CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.i
+.PHONY : src/vault/broker.cpp.i
+
+src/vault/broker.s: src/vault/broker.cpp.s
+.PHONY : src/vault/broker.s
+
+# target to generate assembly for a file
+src/vault/broker.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\void_vault_core.dir\build.make CMakeFiles/void_vault_core.dir/src/vault/broker.cpp.s
+.PHONY : src/vault/broker.cpp.s
+
 src/vault/vault.obj: src/vault/vault.cpp.obj
 .PHONY : src/vault/vault.obj
 
@@ -323,6 +360,30 @@ src/vault/vault.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles\void_vault_core.dir\build.make CMakeFiles/void_vault_core.dir/src/vault/vault.cpp.s
 .PHONY : src/vault/vault.cpp.s
 
+src/vault/void_vault_c.obj: src/vault/void_vault_c.cpp.obj
+.PHONY : src/vault/void_vault_c.obj
+
+# target to build an object file
+src/vault/void_vault_c.cpp.obj:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\void_vault_core.dir\build.make CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.obj
+.PHONY : src/vault/void_vault_c.cpp.obj
+
+src/vault/void_vault_c.i: src/vault/void_vault_c.cpp.i
+.PHONY : src/vault/void_vault_c.i
+
+# target to preprocess a source file
+src/vault/void_vault_c.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\void_vault_core.dir\build.make CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.i
+.PHONY : src/vault/void_vault_c.cpp.i
+
+src/vault/void_vault_c.s: src/vault/void_vault_c.cpp.s
+.PHONY : src/vault/void_vault_c.s
+
+# target to generate assembly for a file
+src/vault/void_vault_c.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles\void_vault_core.dir\build.make CMakeFiles/void_vault_core.dir/src/vault/void_vault_c.cpp.s
+.PHONY : src/vault/void_vault_c.cpp.s
+
 # Help Target
 help:
 	@echo The following are some of the valid targets for this Makefile:
@@ -333,6 +394,7 @@ help:
 	@echo ... rebuild_cache
 	@echo ... test
 	@echo ... auth_test
+	@echo ... broker_test
 	@echo ... encryption_test
 	@echo ... storage_test
 	@echo ... vault_test
@@ -350,9 +412,15 @@ help:
 	@echo ... src/storage/storage.obj
 	@echo ... src/storage/storage.i
 	@echo ... src/storage/storage.s
+	@echo ... src/vault/broker.obj
+	@echo ... src/vault/broker.i
+	@echo ... src/vault/broker.s
 	@echo ... src/vault/vault.obj
 	@echo ... src/vault/vault.i
 	@echo ... src/vault/vault.s
+	@echo ... src/vault/void_vault_c.obj
+	@echo ... src/vault/void_vault_c.i
+	@echo ... src/vault/void_vault_c.s
 .PHONY : help
 
 
