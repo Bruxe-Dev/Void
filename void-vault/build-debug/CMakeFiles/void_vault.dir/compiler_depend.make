@@ -79,6 +79,7 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: D:/Void/void-vault/src/main.cpp \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/sstream.tcc \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/std_abs.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_algobase.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_bvector.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_construct.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_function.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_iterator.h \
@@ -86,6 +87,7 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: D:/Void/void-vault/src/main.cpp \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_iterator_base_types.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_pair.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_uninitialized.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_vector.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf.tcc \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/streambuf_iterator.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/string_view.tcc \
@@ -94,6 +96,7 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: D:/Void/void-vault/src/main.cpp \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator_args.h \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/utility.h \
+  C:/msys64/ucrt64/include/c++/15.2.0/bits/vector.tcc \
   C:/msys64/ucrt64/include/c++/15.2.0/bits/version.h \
   C:/msys64/ucrt64/include/c++/15.2.0/cctype \
   C:/msys64/ucrt64/include/c++/15.2.0/cerrno \
@@ -143,6 +146,7 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: D:/Void/void-vault/src/main.cpp \
   C:/msys64/ucrt64/include/c++/15.2.0/tuple \
   C:/msys64/ucrt64/include/c++/15.2.0/type_traits \
   C:/msys64/ucrt64/include/c++/15.2.0/typeinfo \
+  C:/msys64/ucrt64/include/c++/15.2.0/vector \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/atomic_word.h \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++allocator.h \
   C:/msys64/ucrt64/include/c++/15.2.0/x86_64-w64-mingw32/bits/c++config.h \
@@ -465,6 +469,7 @@ CMakeFiles/void_vault.dir/src/main.cpp.obj: D:/Void/void-vault/src/main.cpp \
   D:/Void/void-vault/src/security/encryption.hpp \
   D:/Void/void-vault/src/security/process_hardening.hpp \
   D:/Void/void-vault/src/security/secure_buffer.hpp \
+  D:/Void/void-vault/src/vault/broker.hpp \
   D:/Void/void-vault/src/vault/vault.hpp
 
 
@@ -714,6 +719,8 @@ C:/msys64/ucrt64/include/c++/15.2.0/bits/ranges_util.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/enqcmdintrin.h:
 
+C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_vector.h:
+
 C:/msys64/ucrt64/include/c++/15.2.0/bits/refwrap.h:
 
 C:/msys64/ucrt64/include/wingdi.h:
@@ -735,6 +742,8 @@ C:/msys64/ucrt64/include/c++/15.2.0/bits/std_abs.h:
 C:/msys64/ucrt64/include/errhandlingapi.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_algobase.h:
+
+C:/msys64/ucrt64/include/c++/15.2.0/bits/stl_bvector.h:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx10_2satcvtintrin.h:
 
@@ -783,6 +792,8 @@ C:/msys64/ucrt64/include/c++/15.2.0/bits/uses_allocator_args.h:
 C:/msys64/ucrt64/include/corecrt.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/bits/utility.h:
+
+C:/msys64/ucrt64/include/c++/15.2.0/bits/vector.tcc:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/ammintrin.h:
 
@@ -888,6 +899,8 @@ C:/msys64/ucrt64/include/namedpipeapi.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/pstl/pstl_config.h:
 
+D:/Void/void-vault/src/vault/broker.hpp:
+
 C:/msys64/ucrt64/include/c++/15.2.0/ratio:
 
 C:/msys64/ucrt64/lib/gcc/x86_64-w64-mingw32/15.2.0/include/avx512bf16intrin.h:
@@ -915,6 +928,8 @@ C:/msys64/ucrt64/include/c++/15.2.0/type_traits:
 C:/msys64/ucrt64/include/sodium/randombytes_sysrandom.h:
 
 C:/msys64/ucrt64/include/c++/15.2.0/typeinfo:
+
+C:/msys64/ucrt64/include/c++/15.2.0/vector:
 
 C:/msys64/ucrt64/include/sodium/runtime.h:
 
