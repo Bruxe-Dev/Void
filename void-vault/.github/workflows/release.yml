@@ -35,10 +35,13 @@ jobs:
           cmake -S . -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DVOID_VAULT_STATIC_RUNTIME=ON
           cmake --build build -j 4
           ctest --test-dir build --output-on-failure
-          mkdir -p "dist/void-vault-${GITHUB_REF_NAME}-windows-x64"
+          mkdir -p "dist/void-vault-${GITHUB_REF_NAME}-windows-x64/include"
+          mkdir -p "dist/void-vault-${GITHUB_REF_NAME}-windows-x64/sdk/python"
           cp build/void_vault.exe "dist/void-vault-${GITHUB_REF_NAME}-windows-x64/"
           strip --strip-all "dist/void-vault-${GITHUB_REF_NAME}-windows-x64/void_vault.exe"
-          cp README.md SECURITY.md LICENSE "dist/void-vault-${GITHUB_REF_NAME}-windows-x64/"
+          cp README.md DEVELOPER_GUIDE.md SECURITY.md LICENSE "dist/void-vault-${GITHUB_REF_NAME}-windows-x64/"
+          cp include/void_vault_c.h "dist/void-vault-${GITHUB_REF_NAME}-windows-x64/include/"
+          cp sdk/python/void_vault.py "dist/void-vault-${GITHUB_REF_NAME}-windows-x64/sdk/python/"
 
       - name: Create ZIP & Checksum (PowerShell)
         shell: pwsh
@@ -74,10 +77,12 @@ jobs:
           cmake --build build -j 4
           ctest --test-dir build --output-on-failure
           STAGE="dist/void-vault-${TAG}-linux-x64"
-          mkdir -p "${STAGE}"
+          mkdir -p "${STAGE}/include" "${STAGE}/sdk/python"
           cp build/void_vault "${STAGE}/"
           strip --strip-all "${STAGE}/void_vault"
-          cp README.md SECURITY.md LICENSE "${STAGE}/"
+          cp README.md DEVELOPER_GUIDE.md SECURITY.md LICENSE "${STAGE}/"
+          cp include/void_vault_c.h "${STAGE}/include/"
+          cp sdk/python/void_vault.py "${STAGE}/sdk/python/"
           tar -C dist -czf "dist/void-vault-${TAG}-linux-x64.tar.gz" "void-vault-${TAG}-linux-x64"
           (cd dist && sha256sum "void-vault-${TAG}-linux-x64.tar.gz" > SHA256SUMS-linux-x64.txt)
 

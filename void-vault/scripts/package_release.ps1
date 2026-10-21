@@ -35,9 +35,10 @@ try {
         & $stripExe --strip-all $exeTarget
     }
 
-    Copy-Item (Join-Path $root "README.md")   $stageDir -Force
-    Copy-Item (Join-Path $root "SECURITY.md") $stageDir -Force
-    Copy-Item (Join-Path $root "LICENSE")     $stageDir -Force
+    Copy-Item (Join-Path $root "README.md")          $stageDir -Force
+    Copy-Item (Join-Path $root "DEVELOPER_GUIDE.md") $stageDir -Force
+    Copy-Item (Join-Path $root "SECURITY.md")        $stageDir -Force
+    Copy-Item (Join-Path $root "LICENSE")            $stageDir -Force
 
     New-Item -ItemType Directory -Force -Path (Join-Path $stageDir "include") | Out-Null
     New-Item -ItemType Directory -Force -Path (Join-Path $stageDir "sdk\python") | Out-Null

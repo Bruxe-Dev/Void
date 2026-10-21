@@ -61,7 +61,13 @@ void-vault/
 │   ├── vault_test.cpp              # End-to-end Vault lifecycle, foreign-data guard, and rotation tests
 │   └── app_e2e_test.cmake          # Multi-process CLI integration test
 ├── scripts/
-│   └── build.ps1                   # Windows MSYS2 UCRT64 build & CTest automation script
+│   ├── build.ps1                   # Windows MSYS2 UCRT64 build & CTest automation script
+│   └── package_release.ps1         # Release bundler (.zip + SHA256SUMS.txt)
+├── include/
+│   └── void_vault_c.h              # Universal C ABI for C/Rust/Go/C#/MQL5 embedding
+├── sdk/
+│   └── python/void_vault.py        # Zero-dependency Python SDK & Capability Broker client
+├── DEVELOPER_GUIDE.md              # Step-by-step developer integration & token guide
 ├── SECURITY.md                     # Threat model, cryptographic design & disclosure policy
 ├── CONTRIBUTING.md                 # Contribution & security review guidelines
 └── LICENSE                         # MIT License
