@@ -1,4 +1,4 @@
-// Void Vault interactive application.
+// Void Vault interactive application & IPC Capability Broker.
 //
 // Passwords and confidential payloads are never accepted on the command line
 // and never pass through std::cin or std::string buffers. All input is read
@@ -6,7 +6,9 @@
 // memory (SecureBuffer).
 
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <vector>
 #include <filesystem>
 
 #include <sodium.h>
@@ -15,6 +17,7 @@
 #include "security/encryption.hpp"
 #include "security/process_hardening.hpp"
 #include "security/secure_buffer.hpp"
+#include "vault/broker.hpp"
 #include "vault/vault.hpp"
 #include "storage.hpp"
 
@@ -38,6 +41,53 @@ namespace
             sodium_memzero(s.data(), s.size());
             s.clear();
         }
+    }
+
+    std::string encodeHex(std::string_view raw)
+    {
+        if (raw.empty())
+        {
+            return {};
+        }
+        std::string hex(raw.size() * 2 + 1, '\0');
+        sodium_bin2hex(
+            hex.data(),
+            hex.size(),
+            reinterpret_cast<const unsigned char *>(raw.data()),
+            raw.size());
+        hex.resize(raw.size() * 2);
+        return hex;
+    }
+
+    bool decodeHexToSecureBuffer(std::string_view hex, SecureBuffer &out)
+    {
+        out.clear();
+        if (hex.empty())
+        {
+            return true;
+        }
+        if ((hex.size() % 2) != 0)
+        {
+            return false;
+        }
+        std::string tmp(hex.size() / 2, '\0');
+        std::size_t bin_len = 0;
+        const int rc = sodium_hex2bin(
+            reinterpret_cast<unsigned char *>(tmp.data()),
+            tmp.size(),
+            hex.data(),
+            hex.size(),
+            nullptr,
+            &bin_len,
+            nullptr);
+        if (rc != 0 || bin_len != tmp.size())
+        {
+            wipe(tmp);
+            return false;
+        }
+        out.assign(tmp);
+        wipe(tmp);
+        return true;
     }
 
     // Reads a single byte from the OS standard input descriptor without
@@ -178,11 +228,12 @@ namespace
 
     void printHelp()
     {
-        std::cout << "Void Vault v1.0.0 — Authenticated Encrypted Local Vault\n"
-                     "Usage: void_vault [--data-dir <directory>] [--kdf <interactive|moderate|sensitive>] [--version] [--help]\n"
+        std::cout << "Void Vault v1.0.0 — Authenticated Encrypted Local Vault & Capability Broker\n"
+                     "Usage: void_vault [--data-dir <directory>] [--kdf <interactive|moderate|sensitive>]\n"
+                     "                  [--broker] [--version] [--help]\n"
                      "  Stores vault_auth.dat (password hash + failed-attempt counter)\n"
                      "  and vault_data.dat (XChaCha20-Poly1305 AEAD encrypted record) in the data directory\n"
-                     "  (default: current directory). Passwords are only read interactively.\n";
+                     "  (default: current directory). Passwords are only read interactively or via --broker IPC.\n";
     }
 
     int firstTimeSetup(Authorizer &authorizer)
@@ -224,6 +275,230 @@ namespace
         std::cout << "Too many invalid setup attempts.\n";
         return 1;
     }
+
+    // IPC Broker loop for external application modules ("Sign in with Void Vault"
+    // & Scoped Secret Broker over standard input/output pipes).
+    int runBrokerMode(Authorizer &authorizer, Vault &vault, VaultBroker &broker)
+    {
+        SecureBuffer line_buf;
+        while (readSecureStreamLine(line_buf))
+        {
+            std::string line(line_buf.view().data(), line_buf.view().size());
+            line_buf.clear();
+            if (line.empty())
+            {
+                continue;
+            }
+
+            std::istringstream in(line);
+            std::string cmd;
+            in >> cmd;
+
+            if (cmd == "QUIT")
+            {
+                wipe(line);
+                vault.lock();
+                std::cout << "OK bye\n" << std::flush;
+                return 0;
+            }
+            else if (cmd == "SETUP")
+            {
+                std::string pw_hex;
+                in >> pw_hex;
+                SecureBuffer pw;
+                if (decodeHexToSecureBuffer(pw_hex, pw) && authorizer.setPassword(pw.view()))
+                {
+                    std::cout << "OK initialized\n" << std::flush;
+                }
+                else
+                {
+                    std::cout << "ERR setup_failed\n" << std::flush;
+                }
+                wipe(pw_hex);
+            }
+            else if (cmd == "UNLOCK")
+            {
+                std::string pw_hex;
+                in >> pw_hex;
+                SecureBuffer pw;
+                if (decodeHexToSecureBuffer(pw_hex, pw) &&
+                    vault.authenticate(pw.view()) && vault.unlock())
+                {
+                    std::cout << "OK unlocked\n" << std::flush;
+                }
+                else
+                {
+                    std::cout << "ERR auth_failed\n" << std::flush;
+                }
+                wipe(pw_hex);
+            }
+            else if (cmd == "LOCK")
+            {
+                vault.lock();
+                std::cout << "OK locked\n" << std::flush;
+            }
+            else if (cmd == "SET_SECRET")
+            {
+                std::string key, val_hex;
+                in >> key >> val_hex;
+                SecureBuffer val;
+                if (decodeHexToSecureBuffer(val_hex, val) && broker.setSecret(key, val.view()))
+                {
+                    std::cout << "OK saved\n" << std::flush;
+                }
+                else
+                {
+                    std::cout << "ERR set_secret_failed\n" << std::flush;
+                }
+                wipe(val_hex);
+            }
+            else if (cmd == "GET_SECRET")
+            {
+                std::string key, val;
+                in >> key;
+                if (broker.getSecret(key, val))
+                {
+                    std::string hex = encodeHex(val);
+                    wipe(val);
+                    std::cout << "OK " << hex << '\n' << std::flush;
+                    wipe(hex);
+                }
+                else
+                {
+                    std::cout << "ERR get_secret_failed\n" << std::flush;
+                }
+            }
+            else if (cmd == "DELETE_SECRET")
+            {
+                std::string key;
+                in >> key;
+                if (broker.deleteSecret(key))
+                {
+                    std::cout << "OK deleted\n" << std::flush;
+                }
+                else
+                {
+                    std::cout << "ERR delete_secret_failed\n" << std::flush;
+                }
+            }
+            else if (cmd == "LIST_KEYS")
+            {
+                std::vector<std::string> keys;
+                if (broker.listKeys(keys))
+                {
+                    std::cout << "OK ";
+                    for (std::size_t i = 0; i < keys.size(); ++i)
+                    {
+                        if (i > 0)
+                        {
+                            std::cout << ',';
+                        }
+                        std::cout << keys[i];
+                    }
+                    std::cout << '\n' << std::flush;
+                }
+                else
+                {
+                    std::cout << "ERR list_keys_failed\n" << std::flush;
+                }
+            }
+            else if (cmd == "ISSUE_TOKEN")
+            {
+                std::string app_id, scope;
+                std::uint64_t ttl = VaultBroker::DEFAULT_TOKEN_TTL_SECONDS;
+                in >> app_id >> scope >> ttl;
+                std::string token;
+                if (broker.issueToken(app_id, scope, ttl, token))
+                {
+                    std::cout << "OK " << token << '\n' << std::flush;
+                }
+                else
+                {
+                    std::cout << "ERR issue_token_failed\n" << std::flush;
+                }
+            }
+            else if (cmd == "VERIFY_TOKEN")
+            {
+                std::string token, app_id;
+                in >> token >> app_id;
+                CapabilityClaims claims;
+                if (broker.verifyToken(token, app_id, claims))
+                {
+                    std::cout << "OK " << claims.scope << ' ' << claims.expires_at << '\n' << std::flush;
+                }
+                else
+                {
+                    std::cout << "ERR invalid_token\n" << std::flush;
+                }
+            }
+            else if (cmd == "TOKEN_GET_SECRET")
+            {
+                std::string token, app_id, key, val;
+                in >> token >> app_id >> key;
+                if (broker.getSecretWithToken(token, app_id, key, val))
+                {
+                    std::string hex = encodeHex(val);
+                    wipe(val);
+                    std::cout << "OK " << hex << '\n' << std::flush;
+                    wipe(hex);
+                }
+                else
+                {
+                    std::cout << "ERR token_get_denied\n" << std::flush;
+                }
+            }
+            else if (cmd == "TOKEN_SET_SECRET")
+            {
+                std::string token, app_id, key, val_hex;
+                in >> token >> app_id >> key >> val_hex;
+                SecureBuffer val;
+                if (decodeHexToSecureBuffer(val_hex, val) &&
+                    broker.setSecretWithToken(token, app_id, key, val.view()))
+                {
+                    std::cout << "OK saved\n" << std::flush;
+                }
+                else
+                {
+                    std::cout << "ERR token_set_denied\n" << std::flush;
+                }
+                wipe(val_hex);
+            }
+            else if (cmd == "DERIVE_APP_KEY")
+            {
+                std::string token, app_id;
+                std::uint64_t subkey_id = 1;
+                in >> token >> app_id >> subkey_id;
+                std::string key_hex;
+                if (broker.deriveAppKey(token, app_id, subkey_id, key_hex))
+                {
+                    std::cout << "OK " << key_hex << '\n' << std::flush;
+                    wipe(key_hex);
+                }
+                else
+                {
+                    std::cout << "ERR derive_key_denied\n" << std::flush;
+                }
+            }
+            else if (cmd == "REVOKE_TOKENS")
+            {
+                if (broker.revokeAllTokens())
+                {
+                    std::cout << "OK revoked\n" << std::flush;
+                }
+                else
+                {
+                    std::cout << "ERR revoke_failed\n" << std::flush;
+                }
+            }
+            else
+            {
+                std::cout << "ERR unknown_command\n" << std::flush;
+            }
+            wipe(line);
+        }
+        vault.lock();
+        return 0;
+    }
 }
 
 int main(int argc, char **argv)
@@ -232,6 +507,7 @@ int main(int argc, char **argv)
 
     std::filesystem::path data_dir = ".";
     KdfProfile kdf_profile = KdfProfile::Interactive;
+    bool broker_mode = false;
 
     for (int i = 1; i < argc; ++i)
     {
@@ -245,6 +521,11 @@ int main(int argc, char **argv)
         {
             std::cout << "void_vault 1.0.0 (libsodium " << sodium_version_string() << ")\n";
             return 0;
+        }
+        if (arg == "--broker")
+        {
+            broker_mode = true;
+            continue;
         }
         if (arg == "--data-dir" && i + 1 < argc)
         {
@@ -291,8 +572,6 @@ int main(int argc, char **argv)
         return 5;
     }
 
-    std::cout << "=== Void Vault ===\n";
-
     Authorizer authorizer((data_dir / "vault_auth.dat").string());
     Storage storage((data_dir / "vault_data.dat").string());
 
@@ -304,6 +583,17 @@ int main(int argc, char **argv)
         return 3;
     }
 
+    Vault vault(authorizer, storage);
+    vault.setKdfProfile(kdf_profile);
+    VaultBroker broker(vault);
+
+    if (broker_mode)
+    {
+        return runBrokerMode(authorizer, vault, broker);
+    }
+
+    std::cout << "=== Void Vault ===\n";
+
     if (!authorizer.isInitialized())
     {
         const int rc = firstTimeSetup(authorizer);
@@ -312,9 +602,6 @@ int main(int argc, char **argv)
             return rc;
         }
     }
-
-    Vault vault(authorizer, storage);
-    vault.setKdfProfile(kdf_profile);
 
     while (true)
     {
@@ -328,7 +615,8 @@ int main(int argc, char **argv)
         }
 
         std::cout << "\n[" << (vault.isUnlocked() ? "UNLOCKED" : "LOCKED") << "] "
-                  << "1) unlock  2) save text  3) show data  4) lock  5) status  6) quit  7) change password\n";
+                  << "1) unlock  2) save text  3) show data  4) lock  5) status  6) quit  "
+                  << "7) change password  8) secrets  9) app token\n";
         std::string choice;
         if (!readLine("> ", choice))
         {
@@ -432,6 +720,98 @@ int main(int argc, char **argv)
             else
             {
                 std::cout << "Password change failed: " << vaultErrorMessage(vault.lastError()) << '\n';
+            }
+        }
+        else if (choice == "8")
+        {
+            if (!vault.isUnlocked())
+            {
+                std::cout << "Rejected: " << vaultErrorMessage(VaultError::Locked) << '\n';
+                continue;
+            }
+            std::string action;
+            if (!readLine("Secrets [set/get/del/list]: ", action))
+            {
+                continue;
+            }
+            if (action == "set")
+            {
+                std::string key;
+                SecureBuffer val;
+                if (!readLine("Key name: ", key) || !readSensitiveLine("Secret value: ", val))
+                {
+                    continue;
+                }
+                if (broker.setSecret(key, val.view()))
+                {
+                    std::cout << "Secret '" << key << "' saved.\n";
+                }
+                else
+                {
+                    std::cout << "Failed to save secret.\n";
+                }
+            }
+            else if (action == "get")
+            {
+                std::string key, val;
+                if (!readLine("Key name: ", key))
+                {
+                    continue;
+                }
+                if (broker.getSecret(key, val))
+                {
+                    std::cout << key << " = " << val << '\n';
+                    wipe(val);
+                }
+                else
+                {
+                    std::cout << "Secret not found.\n";
+                }
+            }
+            else if (action == "del")
+            {
+                std::string key;
+                if (!readLine("Key name: ", key))
+                {
+                    continue;
+                }
+                std::cout << (broker.deleteSecret(key) ? "Secret deleted.\n" : "Secret not found.\n");
+            }
+            else if (action == "list")
+            {
+                std::vector<std::string> keys;
+                if (broker.listKeys(keys))
+                {
+                    std::cout << "Keys (" << keys.size() << "):";
+                    for (const auto &k : keys)
+                    {
+                        std::cout << ' ' << k;
+                    }
+                    std::cout << '\n';
+                }
+            }
+        }
+        else if (choice == "9")
+        {
+            if (!vault.isUnlocked())
+            {
+                std::cout << "Rejected: " << vaultErrorMessage(VaultError::Locked) << '\n';
+                continue;
+            }
+            std::string app_id, scope;
+            if (!readLine("Application ID (e.g. void-trader): ", app_id) ||
+                !readLine("Allowed scope (e.g. read:trader.* or *): ", scope))
+            {
+                continue;
+            }
+            std::string token;
+            if (broker.issueToken(app_id, scope, VaultBroker::DEFAULT_TOKEN_TTL_SECONDS, token))
+            {
+                std::cout << "Issued scoped capability token (TTL 300s):\n" << token << '\n';
+            }
+            else
+            {
+                std::cout << "Failed to issue token (check app_id / scope format).\n";
             }
         }
         else if (!choice.empty())

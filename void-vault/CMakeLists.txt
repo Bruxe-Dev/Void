@@ -128,6 +128,8 @@ endif()
 # Shared security/storage core used by the application and every test.
 add_library(void_vault_core STATIC
     src/vault/vault.cpp
+    src/vault/broker.cpp
+    src/vault/void_vault_c.cpp
     src/security/auth.cpp
     src/security/encryption.cpp
     src/storage/storage.cpp
