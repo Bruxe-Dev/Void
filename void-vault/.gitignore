@@ -1,5 +1,20 @@
-compiler_test.cpp
-compiler_test.exe
-build
-*.gz
-*.dat
+# Build directories
+build/
+build-*/
+biuld/
+cmake-build-*/
+out/
+
+# Runtime vault files and locks
+vault_auth.dat
+vault_data.dat
+*.dat.tmp
+*.lock
+
+# IDE / OS files
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
