@@ -6,11 +6,17 @@ cmake-build-*/
 out/
 dist/
 
-# Runtime vault files and locks
-vault_auth.dat
-vault_data.dat
+# Runtime vault files, test data, and locks
+*.dat
 *.dat.tmp
 *.lock
+
+# Local binaries, archives, and scratch files
+*.exe
+*.tar.gz
+*.zip
+compiler_test.*
+CMakeUserPresets.json
 
 # IDE / OS files
 .vscode/
