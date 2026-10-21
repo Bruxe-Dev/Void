@@ -13,6 +13,8 @@ const char* vaultErrorMessage(VaultError error) {
     case VaultError::EncryptFailed: return "encryption failed";
     case VaultError::ForeignDataExists:
         return "existing data file cannot be decrypted with this password; refusing to overwrite it";
+    case VaultError::WeakPassword:
+        return "password does not meet minimum length or complexity requirements";
     }
     return "unknown error";
 }
@@ -144,3 +146,69 @@ bool Vault::loadData(std::string& data) {
     return true;
 }
 
+bool Vault::changePassword(std::string_view current_password, std::string_view new_password) {
+    if (!is_unlocked || session_password.empty()) {
+        last_error = VaultError::Locked;
+        return false;
+    }
+
+    if (!Authorizer::isPasswordAcceptable(new_password)) {
+        last_error = VaultError::WeakPassword;
+        return false;
+    }
+
+    if (!session_password.constantTimeEquals(current_password)) {
+        // Count the failed attempt in the authorizer and lock the vault.
+        (void)authorizer.verifyPassword(current_password);
+        lock();
+        last_error = VaultError::Locked;
+        return false;
+    }
+
+    const bool has_data = storage.exists();
+    std::string old_encrypted;
+    std::string plaintext;
+    std::string new_encrypted;
+
+    if (has_data) {
+        if (!storage.load(old_encrypted)) {
+            last_error = VaultError::StorageError;
+            return false;
+        }
+        if (!old_encrypted.empty()) {
+            if (!encryption.decrypt(old_encrypted, current_password, plaintext)) {
+                last_error = VaultError::DecryptFailed;
+                return false;
+            }
+            const bool enc_ok = encryption.encrypt(plaintext, new_password, new_encrypted);
+            if (!plaintext.empty()) {
+                sodium_memzero(plaintext.data(), plaintext.size());
+            }
+            if (!enc_ok) {
+                last_error = VaultError::EncryptFailed;
+                return false;
+            }
+        }
+    }
+
+    // Re-encrypt data file first, then update auth file (with rollback on failure).
+    if (has_data && !old_encrypted.empty()) {
+        if (!storage.save(new_encrypted)) {
+            last_error = VaultError::StorageError;
+            return false;
+        }
+    }
+
+    if (!authorizer.changePassword(current_password, new_password)) {
+        if (has_data && !old_encrypted.empty()) {
+            (void)storage.save(old_encrypted); // Roll back data file to old key
+        }
+        last_error = VaultError::StorageError;
+        return false;
+    }
+
+    session_password.assign(new_password);
+    is_unlocked = true;
+    last_error = VaultError::None;
+    return true;
+}

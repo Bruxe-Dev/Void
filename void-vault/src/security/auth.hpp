@@ -1,6 +1,7 @@
 #ifndef VOID_VAULT_AUTH_HPP
 #define VOID_VAULT_AUTH_HPP
 
+#include <cstddef>
 #include <string>
 #include <string_view>
 
@@ -27,13 +28,23 @@ class Authorizer {
 public:
     static constexpr int MAX_FAILED_ATTEMPTS = 5;
     static constexpr std::size_t MIN_PASSWORD_LENGTH = 12;
+    static constexpr std::size_t MAX_PASSWORD_LENGTH = 1024;
 
     Authorizer();  // in-memory only; lockout is session-only
 
     explicit Authorizer(const std::string& hash_file_path);
+    ~Authorizer();
+
+    Authorizer(const Authorizer&) = delete;
+    Authorizer& operator=(const Authorizer&) = delete;
+
+    // Validates password length, printable characters, and non-trivial entropy
+    // (rejects control characters, all-whitespace, or repeated single character).
+    static bool isPasswordAcceptable(std::string_view candidate) noexcept;
 
     bool setPassword(std::string_view new_password);
     bool verifyPassword(std::string_view attempted_password);
+    bool changePassword(std::string_view current_password, std::string_view new_password);
 
     bool isAuthorized() const;
     void revokeAuthorization();
@@ -58,4 +69,3 @@ private:
 };
 
 #endif
-

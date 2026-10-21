@@ -52,6 +52,24 @@ namespace
         out = value;
         return true;
     }
+
+    bool hashPassword(std::string_view password, std::string &out_hash)
+    {
+        char generated_hash[crypto_pwhash_STRBYTES] = {};
+        if (crypto_pwhash_str(
+                generated_hash,
+                password.data(),
+                static_cast<unsigned long long>(password.size()),
+                crypto_pwhash_OPSLIMIT_INTERACTIVE,
+                crypto_pwhash_MEMLIMIT_INTERACTIVE) != 0)
+        {
+            sodium_memzero(generated_hash, sizeof(generated_hash));
+            return false;
+        }
+        out_hash.assign(generated_hash);
+        sodium_memzero(generated_hash, sizeof(generated_hash));
+        return true;
+    }
 }
 
 Authorizer::Authorizer()
@@ -83,11 +101,49 @@ Authorizer::Authorizer(const std::string& file_path)
 
     if (!loadPasswordHash()) {
         storage_error = true;
+        if (!password_hash.empty()) {
+            sodium_memzero(password_hash.data(), password_hash.size());
+            password_hash.clear();
+        }
+    }
+}
+
+Authorizer::~Authorizer() {
+    authorized = false;
+    if (!password_hash.empty()) {
+        sodium_memzero(password_hash.data(), password_hash.size());
         password_hash.clear();
     }
 }
 
+bool Authorizer::isPasswordAcceptable(std::string_view candidate) noexcept {
+    if (candidate.size() < MIN_PASSWORD_LENGTH ||
+        candidate.size() > MAX_PASSWORD_LENGTH) {
+        return false;
+    }
+    bool has_non_space = false;
+    bool has_distinct_char = false;
+    const char first = candidate.front();
+    for (char c : candidate) {
+        const auto uc = static_cast<unsigned char>(c);
+        // Reject ASCII control characters (NUL..US and DEL).
+        if (uc < 0x20U || uc == 0x7FU) {
+            return false;
+        }
+        if (c != ' ') {
+            has_non_space = true;
+        }
+        if (c != first) {
+            has_distinct_char = true;
+        }
+    }
+    return has_non_space && has_distinct_char;
+}
+
 bool Authorizer::loadPasswordHash() {
+    if (hash_file_path.empty() || Storage::isSymlinkOrReparsePoint(hash_file_path)) {
+        return false;
+    }
     std::error_code ec;
     const std::filesystem::path p(hash_file_path);
     const bool present = std::filesystem::exists(p, ec);
@@ -113,11 +169,20 @@ bool Authorizer::loadPasswordHash() {
     if (!std::getline(in, first)) {
         return false;
     }
+    if (!first.empty() && first.back() == '\r') {
+        first.pop_back();
+    }
 
     if (first == FORMAT_HEADER) {
         std::string hash, counter, extra;
         if (!std::getline(in, hash) || !std::getline(in, counter)) {
             return false;
+        }
+        if (!hash.empty() && hash.back() == '\r') {
+            hash.pop_back();
+        }
+        if (!counter.empty() && counter.back() == '\r') {
+            counter.pop_back();
         }
         if (std::getline(in, extra) && !extra.empty()) {
             return false;
@@ -149,6 +214,10 @@ bool Authorizer::persist(const std::string& hash, int failed, bool allow_replace
     if (!persistent_storage) {
         return true;
     }
+    FileLock lock(hash_file_path);
+    if (!lock.isLocked()) {
+        return false;
+    }
     std::string record;
     record.reserve(hash.size() + 32);
     record += FORMAT_HEADER;
@@ -163,33 +232,21 @@ bool Authorizer::persist(const std::string& hash, int failed, bool allow_replace
 bool Authorizer::setPassword(std::string_view new_password) {
     if (storage_error ||
         password_initialized ||
-        new_password.size() < MIN_PASSWORD_LENGTH) {
+        !isPasswordAcceptable(new_password)) {
         return false;
     }
 
-    char generated_hash[crypto_pwhash_STRBYTES] = {};
-
-    if (crypto_pwhash_str(
-            generated_hash,
-            new_password.data(),
-            static_cast<unsigned long long>(new_password.size()),
-            crypto_pwhash_OPSLIMIT_INTERACTIVE,
-            crypto_pwhash_MEMLIMIT_INTERACTIVE
-        ) != 0) {
-        sodium_memzero(generated_hash, sizeof(generated_hash));
+    std::string candidate_hash;
+    if (!hashPassword(new_password, candidate_hash)) {
         return false;
     }
-
-    const std::string candidate_hash(generated_hash);
-
-    sodium_memzero(generated_hash, sizeof(generated_hash));
 
     // allow_replace = false: never overwrite an account created meanwhile.
     if (!persist(candidate_hash, 0, false)) {
         return false;
     }
 
-    password_hash = candidate_hash;
+    password_hash = std::move(candidate_hash);
     password_initialized = true;
     failed_attempts = 0;
     locked_out = false;
@@ -203,7 +260,8 @@ bool Authorizer::verifyPassword(std::string_view attempted_password) {
     if (storage_error ||
         locked_out ||
         !password_initialized ||
-        password_hash.empty()) {
+        password_hash.empty() ||
+        attempted_password.size() > MAX_PASSWORD_LENGTH) {
         return false;
     }
 
@@ -232,6 +290,33 @@ bool Authorizer::verifyPassword(std::string_view attempted_password) {
     }
 
     return false;
+}
+
+bool Authorizer::changePassword(std::string_view current_password, std::string_view new_password) {
+    if (!isPasswordAcceptable(new_password)) {
+        return false;
+    }
+    if (!verifyPassword(current_password)) {
+        return false;
+    }
+
+    std::string candidate_hash;
+    if (!hashPassword(new_password, candidate_hash)) {
+        return false;
+    }
+
+    if (!persist(candidate_hash, 0, true)) {
+        return false;
+    }
+
+    if (!password_hash.empty()) {
+        sodium_memzero(password_hash.data(), password_hash.size());
+    }
+    password_hash = std::move(candidate_hash);
+    failed_attempts = 0;
+    locked_out = false;
+    authorized = true;
+    return true;
 }
 
 bool Authorizer::isAuthorized() const {

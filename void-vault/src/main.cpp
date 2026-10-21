@@ -1,8 +1,9 @@
 // Void Vault interactive application.
 //
-// Passwords are never accepted on the command line. They are read from stdin
-// without echo when stdin is a console; when stdin is redirected (automated
-// tests) they are read as plain lines.
+// Passwords and confidential payloads are never accepted on the command line
+// and never pass through std::cin or std::string buffers. All input is read
+// byte-by-byte from the OS standard input handle directly into sodium_malloc
+// memory (SecureBuffer).
 
 #include <iostream>
 #include <string>
@@ -11,6 +12,8 @@
 #include <sodium.h>
 
 #include "security/auth.hpp"
+#include "security/encryption.hpp"
+#include "security/process_hardening.hpp"
 #include "security/secure_buffer.hpp"
 #include "vault/vault.hpp"
 #include "storage.hpp"
@@ -35,6 +38,28 @@ namespace
             sodium_memzero(s.data(), s.size());
             s.clear();
         }
+    }
+
+    // Reads a single byte from the OS standard input descriptor without
+    // std::cin / stdio buffering, so secrets never linger in stream buffers.
+    bool readRawByte(char &out_byte) noexcept
+    {
+#ifdef _WIN32
+        HANDLE h = GetStdHandle(STD_INPUT_HANDLE);
+        if (h == INVALID_HANDLE_VALUE || h == nullptr)
+        {
+            return false;
+        }
+        DWORD bytes_read = 0;
+        if (!ReadFile(h, &out_byte, 1, &bytes_read, nullptr) || bytes_read != 1)
+        {
+            return false;
+        }
+        return true;
+#else
+        const ssize_t n = ::read(STDIN_FILENO, &out_byte, 1);
+        return n == 1;
+#endif
     }
 
     // RAII: disables console echo while alive (no-op if stdin is not a console).
@@ -84,48 +109,78 @@ namespace
 #endif
     };
 
-    // Returns false on EOF. The secret goes straight into a SecureBuffer and
-    // the temporary std::string is wiped.
-    bool readSecret(const char *prompt, SecureBuffer &out)
+    bool readSecureStreamLine(SecureBuffer &out)
     {
-        std::cout << prompt << std::flush;
-        std::string line;
-        bool ok;
+        out.clear();
+        out.reserve(SecureBuffer::DEFAULT_CAPACITY);
+        char c = '\0';
+        bool got_any = false;
+        while (readRawByte(c))
         {
-            EchoGuard guard;
-            ok = static_cast<bool>(std::getline(std::cin, line));
+            got_any = true;
+            if (c == '\n')
+            {
+                sodium_memzero(&c, sizeof(c));
+                break;
+            }
+            if (c == '\b' || c == 0x7F)
+            {
+                out.pop_back();
+                sodium_memzero(&c, sizeof(c));
+                continue;
+            }
+            if (!out.push_back(c))
+            {
+                sodium_memzero(&c, sizeof(c));
+                out.clear();
+                return false;
+            }
+            sodium_memzero(&c, sizeof(c));
         }
-        if (ok && !line.empty() && line.back() == '\r')
+        sodium_memzero(&c, sizeof(c));
+        if (!got_any)
         {
-            line.pop_back();
-        }
-        if (ok)
-        {
-            out.assign(line);
-        }
-        wipe(line);
-        return ok;
-    }
-
-    bool readLine(const char *prompt, std::string &out)
-    {
-        std::cout << prompt << std::flush;
-        if (!std::getline(std::cin, out))
-        {
+            out.clear();
             return false;
         }
-        if (!out.empty() && out.back() == '\r')
+        if (!out.empty() && out.view().back() == '\r')
         {
             out.pop_back();
         }
         return true;
     }
 
+    // Reads a password with echo disabled directly into sodium_malloc memory.
+    bool readSecret(const char *prompt, SecureBuffer &out)
+    {
+        std::cout << prompt << std::flush;
+        EchoGuard guard;
+        return readSecureStreamLine(out);
+    }
+
+    // Reads a single line (echo enabled) directly into sodium_malloc memory.
+    bool readSensitiveLine(const char *prompt, SecureBuffer &out)
+    {
+        std::cout << prompt << std::flush;
+        return readSecureStreamLine(out);
+    }
+
+    bool readLine(const char *prompt, std::string &out)
+    {
+        SecureBuffer buf;
+        if (!readSensitiveLine(prompt, buf))
+        {
+            return false;
+        }
+        out.assign(buf.view().data(), buf.view().size());
+        return true;
+    }
+
     void printHelp()
     {
-        std::cout << "Usage: void_vault [--data-dir <directory>] [--help]\n"
+        std::cout << "Usage: void_vault [--data-dir <directory>] [--kdf <interactive|moderate|sensitive>] [--help]\n"
                      "  Stores vault_auth.dat (password hash + failed-attempt counter)\n"
-                     "  and vault_data.dat (encrypted record) in the data directory\n"
+                     "  and vault_data.dat (XChaCha20-Poly1305 AEAD encrypted record) in the data directory\n"
                      "  (default: current directory). Passwords are only read interactively.\n";
     }
 
@@ -147,7 +202,12 @@ namespace
                 std::cout << "Password too short.\n";
                 continue;
             }
-            if (first.view() != second.view())
+            if (!Authorizer::isPasswordAcceptable(first.view()))
+            {
+                std::cout << "Password rejected (must contain printable, non-repeating characters).\n";
+                continue;
+            }
+            if (!first.constantTimeEquals(second))
             {
                 std::cout << "Passwords do not match.\n";
                 continue;
@@ -167,7 +227,11 @@ namespace
 
 int main(int argc, char **argv)
 {
+    hardenProcess();
+
     std::filesystem::path data_dir = ".";
+    KdfProfile kdf_profile = KdfProfile::Interactive;
+
     for (int i = 1; i < argc; ++i)
     {
         const std::string arg = argv[i];
@@ -181,6 +245,27 @@ int main(int argc, char **argv)
             data_dir = argv[++i];
             continue;
         }
+        if (arg == "--kdf" && i + 1 < argc)
+        {
+            const std::string mode = argv[++i];
+            if (mode == "interactive")
+            {
+                kdf_profile = KdfProfile::Interactive;
+                continue;
+            }
+            if (mode == "moderate")
+            {
+                kdf_profile = KdfProfile::Moderate;
+                continue;
+            }
+            if (mode == "sensitive")
+            {
+                kdf_profile = KdfProfile::Sensitive;
+                continue;
+            }
+            std::cerr << "Invalid --kdf profile: " << mode << " (expected interactive, moderate, or sensitive)\n";
+            return 2;
+        }
         std::cerr << "Unknown or incomplete argument: " << arg << '\n';
         printHelp();
         return 2;
@@ -191,6 +276,13 @@ int main(int argc, char **argv)
     {
         std::cerr << "Data directory does not exist: " << data_dir.string() << '\n';
         return 2;
+    }
+
+    FileLock session_lock((data_dir / "vault_session").string());
+    if (!session_lock.isLocked())
+    {
+        std::cerr << "Another Void Vault process is already using this data directory.\n";
+        return 5;
     }
 
     std::cout << "=== Void Vault ===\n";
@@ -216,6 +308,7 @@ int main(int argc, char **argv)
     }
 
     Vault vault(authorizer, storage);
+    vault.setKdfProfile(kdf_profile);
 
     while (true)
     {
@@ -229,7 +322,7 @@ int main(int argc, char **argv)
         }
 
         std::cout << "\n[" << (vault.isUnlocked() ? "UNLOCKED" : "LOCKED") << "] "
-                  << "1) unlock  2) save text  3) show data  4) lock  5) status  6) quit\n";
+                  << "1) unlock  2) save text  3) show data  4) lock  5) status  6) quit  7) change password\n";
         std::string choice;
         if (!readLine("> ", choice))
         {
@@ -262,12 +355,12 @@ int main(int argc, char **argv)
                 std::cout << "Rejected: " << vaultErrorMessage(VaultError::Locked) << '\n';
                 continue;
             }
-            std::string text;
-            if (!readLine("Text to store (single line): ", text))
+            SecureBuffer text;
+            if (!readSensitiveLine("Text to store (single line): ", text))
             {
                 continue;
             }
-            if (vault.saveData(text))
+            if (vault.saveData(text.view()))
             {
                 std::cout << "Saved (encrypted).\n";
             }
@@ -275,7 +368,6 @@ int main(int argc, char **argv)
             {
                 std::cout << "Save failed: " << vaultErrorMessage(vault.lastError()) << '\n';
             }
-            wipe(text);
         }
         else if (choice == "3")
         {
@@ -307,6 +399,34 @@ int main(int argc, char **argv)
             vault.lock();
             std::cout << "Vault locked. Goodbye.\n";
             return 0;
+        }
+        else if (choice == "7")
+        {
+            if (!vault.isUnlocked())
+            {
+                std::cout << "Rejected: " << vaultErrorMessage(VaultError::Locked) << '\n';
+                continue;
+            }
+            SecureBuffer current_pw, new_pw, confirm_pw;
+            if (!readSecret("Current password: ", current_pw) ||
+                !readSecret("New password: ", new_pw) ||
+                !readSecret("Confirm new password: ", confirm_pw))
+            {
+                continue;
+            }
+            if (!new_pw.constantTimeEquals(confirm_pw))
+            {
+                std::cout << "Passwords do not match.\n";
+                continue;
+            }
+            if (vault.changePassword(current_pw.view(), new_pw.view()))
+            {
+                std::cout << "Password changed and data re-encrypted.\n";
+            }
+            else
+            {
+                std::cout << "Password change failed: " << vaultErrorMessage(vault.lastError()) << '\n';
+            }
         }
         else if (!choice.empty())
         {
