@@ -1,6 +1,8 @@
-MetaTrader5
 numpy
 pandas
 torch
 xgboost
 scikit-learn
+
+[:sys_platform == "win32"]
+MetaTrader5

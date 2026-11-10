@@ -9,7 +9,7 @@ account-aware risk manager. Behaviour changes (defect fixes):
 The live runners no longer call this; they use execution.order_gate.OrderGate.
 """
 
-import MetaTrader5 as mt5
+from void_fx.mt5_compat import mt5
 
 from void_fx.config import RISK_PERCENTAGE
 from void_fx.execution.risk_manager import InstrumentSpec, floor_to_step, loss_per_lot_from_ticks

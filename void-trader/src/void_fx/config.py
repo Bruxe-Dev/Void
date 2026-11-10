@@ -3,6 +3,7 @@ Central configuration. Every hard-coded constant from the original
 live_forex_expert.py lives here, with identical values, so behaviour is unchanged.
 """
 
+import os
 from pathlib import Path
 
 # ------------------------------------------------------------------
@@ -18,8 +19,8 @@ RAW_DATA_DIR = DATA_DIR / "raw"
 # ------------------------------------------------------------------
 # BROKER / TERMINAL
 # ------------------------------------------------------------------
-MT5_PATH = r"C:\Program Files\MetaTrader 5\terminal64.exe"
-ACCOUNT_NUMBER = 5057177985
+MT5_PATH = os.environ.get("MT5_PATH", r"C:\Program Files\MetaTrader 5\terminal64.exe")
+ACCOUNT_NUMBER = int(os.environ.get("MT5_ACCOUNT", "1234567890"))
 MAGIC_NUMBER = 202610
 
 # ------------------------------------------------------------------
@@ -37,7 +38,7 @@ MAX_HOLDING_BARS = 24         # vertical barrier / purge gap (hours)
 # ------------------------------------------------------------------
 # LIVE LOOP
 # ------------------------------------------------------------------
-BARS_TO_FETCH = 500           # >=169 closed bars needed by the regime filter
+BARS_TO_FETCH = 1500          # >= features.cascade.MIN_HISTORY_BARS (800) + margin
 CYCLE_INTERVAL_SECONDS = 3600
 
 # Regime filter mode. False = SHADOW (log only). See scripts/calibrate_regime.py:

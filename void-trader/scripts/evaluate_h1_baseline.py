@@ -5,7 +5,7 @@ Reproducible evaluation, account-size-aware backtesting ($50, $100, $500, $100,0
 and disciplined experiments against the unchanged H1 Cascade and Legacy baselines.
 
 Usage:
-    C:\\Users\\HP\\anaconda3\\envs\\void\\python.exe scripts/evaluate_h1_baseline.py
+    python scripts/evaluate_h1_baseline.py --model-dir models/cascade_candidate
 """
 
 from __future__ import annotations
@@ -46,25 +46,13 @@ from void_fx.labeling.cascade import (
     side_aligned_outcome,
 )
 from void_fx.labeling.triple_barrier import bracket_outcomes, generate_triple_barrier_labels
+from void_fx.models.cascade_infer import CascadeModel
 from void_fx.models.lstm import ForexLSTMAnalyst
 
 
-def load_cascade_checkpoint(model_dir: Path = CASCADE_MODELS_DIR):
-    with open(model_dir / "scaler.json", "r", encoding="utf-8") as f:
-        scaler = FeatureScaler.from_dict(json.load(f))
-    with open(model_dir / "xgb_dir.pkl", "rb") as f:
-        xgb_dir = pickle.load(f)
-    with open(model_dir / "meta_gate.pkl", "rb") as f:
-        meta_gate = pickle.load(f)
-    lstm_dir = ForexLSTMAnalyst(
-        input_dim=len(CASCADE_FEATURE_COLS),
-        hidden_dim=64,
-        output_dim=2,
-        num_layers=2,
-    )
-    lstm_dir.load_state_dict(torch.load(model_dir / "lstm_dir.pth", weights_only=True))
-    lstm_dir.eval()
-    return scaler, xgb_dir, lstm_dir, meta_gate
+def load_cascade_checkpoint(model_dir: Path = CASCADE_MODELS_DIR) -> CascadeModel:
+    """Loads scaler + models + cascade_config.json through the shared CascadeModel."""
+    return CascadeModel.load(model_dir)
 
 
 def prepare_symbol_splits(symbol: str):
@@ -103,61 +91,21 @@ def prepare_symbol_splits(symbol: str):
     return train_df, val_df, test_df, oos_df, point
 
 
-def compute_cascade_predictions(
-    df: pd.DataFrame,
-    scaler: FeatureScaler,
-    xgb_dir,
-    lstm_dir,
-    meta_gate,
-    symmetrize: bool = False,
-) -> dict[str, np.ndarray]:
-    """Vectorized causal inference matching live cascade_runner."""
-    X_raw = df[CASCADE_FEATURE_COLS].to_numpy(dtype=float)
-    X_norm = scaler.transform(X_raw)
-    n = len(X_norm)
-
-    # 3D sliding windows: row i uses X_norm[i - LOOKBACK_WINDOW + 1 : i + 1]
-    # Note: in live cascade_runner, X_3d_live = X_norm[-LOOKBACK_WINDOW:] and X_2d_live = X_norm[-1:]
-    X_3d = np.zeros((n, LOOKBACK_WINDOW, X_norm.shape[1]), dtype=np.float32)
-    for i in range(LOOKBACK_WINDOW - 1, n):
-        X_3d[i] = X_norm[i - LOOKBACK_WINDOW + 1 : i + 1]
-
+def compute_cascade_predictions(df: pd.DataFrame, model: CascadeModel, symmetrize: bool = True) -> dict:
+    """Vectorized causal inference through the SAME code path as live trading.
+    (`symmetrize` is kept for backwards compatibility; v3 inference is always symmetrised.)"""
     t0 = time.perf_counter()
-    xgb_probs = xgb_dir.predict_proba(X_norm)
-    with torch.no_grad():
-        lstm_logits = lstm_dir(torch.tensor(X_3d))
-        lstm_probs = torch.softmax(lstm_logits, dim=1).numpy()
-
-    if symmetrize:
-        X_norm_m = mirror_features(X_norm)
-        X_3d_m = mirror_features(X_3d)
-        xgb_probs_m = xgb_dir.predict_proba(X_norm_m)
-        with torch.no_grad():
-            lstm_probs_m = torch.softmax(lstm_dir(torch.tensor(X_3d_m)), dim=1).numpy()
-        # Under chart inversion, Short on mirrored == Long on original
-        xgb_p_long = 0.5 * (xgb_probs[:, 1] + xgb_probs_m[:, 0])
-        xgb_probs = np.column_stack([1.0 - xgb_p_long, xgb_p_long])
-        lstm_p_long = 0.5 * (lstm_probs[:, 1] + lstm_probs_m[:, 0])
-        lstm_probs = np.column_stack([1.0 - lstm_p_long, lstm_p_long])
-
-    p_long = 0.5 * xgb_probs[:, 1] + 0.5 * lstm_probs[:, 1]
-    p_short = 1.0 - p_long
-    direction = np.where(p_long >= p_short, 1, -1)
-
-    X_meta = np.hstack([X_norm, xgb_probs])
-    p_expansion = meta_gate.predict_proba(X_meta)[:, 1]
+    out = model.predict_frame(df)
     elapsed_ms = (time.perf_counter() - t0) * 1000.0
-
-    # First LOOKBACK_WINDOW - 1 rows lack full 24-bar LSTM context
-    warmup_mask = np.arange(n) >= (LOOKBACK_WINDOW - 1)
+    px, pl = out["p_long_xgb"], out["p_long_lstm"]
     return dict(
-        xgb_probs=xgb_probs,
-        lstm_probs=lstm_probs,
-        p_long=p_long,
-        p_short=p_short,
-        direction=direction,
-        p_expansion=p_expansion,
-        warmup_mask=warmup_mask,
+        xgb_probs=np.column_stack([1 - px, px]),
+        lstm_probs=np.column_stack([1 - pl, pl]),
+        p_long=out["p_long"],
+        p_short=1.0 - out["p_long"],
+        direction=out["direction"],
+        p_expansion=out["p_expansion"],
+        warmup_mask=out["warmup_mask"],
         elapsed_ms=elapsed_ms,
     )
 
@@ -209,9 +157,13 @@ def evaluate_legacy_baseline(symbol: str = "EURUSD"):
 def main():
     parser = argparse.ArgumentParser(description="Evaluate H1 baseline and account-aware backtests")
     parser.add_argument("--json-out", type=Path, default=None, help="Optional path to save JSON summary")
+    parser.add_argument("--model-dir", type=Path, default=CASCADE_MODELS_DIR, help="Cascade checkpoint directory")
     args = parser.parse_args()
 
-    scaler, xgb_dir, lstm_dir, meta_gate = load_cascade_checkpoint(CASCADE_MODELS_DIR)
+    model = load_cascade_checkpoint(args.model_dir)
+    thr = model.threshold
+    print(f"[*] Model dir: {args.model_dir} | version={model.config.get('version')} | threshold={thr:.2f} "
+          f"| approved={model.approved}")
     print("=" * 78)
     print("VOID TRADER — H1 BASELINE VERIFICATION & ACCOUNT-AWARE EVALUATION")
     print("=" * 78)
@@ -219,11 +171,16 @@ def main():
     summary = {"predictive": {}, "account_scenarios": {}, "experiments": {}, "legacy": {}}
 
     # 1. Legacy v1 baseline check on EURUSD
-    leg = evaluate_legacy_baseline("EURUSD")
-    summary["legacy"]["EURUSD"] = leg
-    print(f"\n[1] Legacy v1 (Long-Only 3-Class) OOS on EURUSD ({leg['test_bars']} bars):")
-    print(f"    Signals={leg['buy_signals']} | Trades={leg['accepted_trades']} | WinRate={leg['win_rate']:.2f}% "
-          f"| Return($100k)={leg['return_pct']:+.2f}% | MaxDD={leg['max_dd_pct']:.2f}% | Signal Mean R={leg['signal_mean_r']:+.4f}")
+    try:
+        leg = evaluate_legacy_baseline("EURUSD")
+    except FileNotFoundError as e:
+        leg = None
+        print(f"\n[1] Legacy v1 models not found, skipping ({e.filename})")
+    if leg:
+        summary["legacy"]["EURUSD"] = leg
+        print(f"\n[1] Legacy v1 (Long-Only 3-Class) OOS on EURUSD ({leg['test_bars']} bars):")
+        print(f"    Signals={leg['buy_signals']} | Trades={leg['accepted_trades']} | WinRate={leg['win_rate']:.2f}% "
+              f"| Return($100k)={leg['return_pct']:+.2f}% | MaxDD={leg['max_dd_pct']:.2f}% | Signal Mean R={leg['signal_mean_r']:+.4f}")
 
     # 2. Bidirectional Cascade H1 Baseline predictive & trading evaluation
     print("\n[2] Bidirectional Cascade H1 Baseline — Out-of-Sample Predictive Metrics:")
@@ -231,7 +188,7 @@ def main():
     for sym in SYMBOLS:
         tr, va, te, oos, pt = prepare_symbol_splits(sym)
         splits[sym] = (tr, va, te, oos, pt)
-        pred = compute_cascade_predictions(oos, scaler, xgb_dir, lstm_dir, meta_gate, symmetrize=False)
+        pred = compute_cascade_predictions(oos, model)
         m = pred["warmup_mask"]
         y_dir = oos["y_dir"].to_numpy()[m].astype(int)
         xgb_acc = accuracy_score(y_dir, (pred["xgb_probs"][m, 1] >= 0.5).astype(int))
@@ -265,9 +222,9 @@ def main():
     # 3. Account-size-aware backtests on EURUSD OOS for $50, $100, $500, $100,000
     print("\n[3] Account-Size-Aware Risk Manager Backtest on EURUSD OOS (Baseline H1 Cascade):")
     _, _, _, eurusd_oos, eurusd_pt = splits["EURUSD"]
-    pred_eu = compute_cascade_predictions(eurusd_oos, scaler, xgb_dir, lstm_dir, meta_gate)
+    pred_eu = compute_cascade_predictions(eurusd_oos, model)
     base_signals_eu = np.where(
-        pred_eu["warmup_mask"] & (pred_eu["p_expansion"] >= 0.50),
+        pred_eu["warmup_mask"] & (pred_eu["p_expansion"] >= thr),
         pred_eu["direction"],
         0,
     )
@@ -300,7 +257,7 @@ def main():
     # 4. Disciplined experiments on Validation vs Held-Out Test (both symbols)
     print("\n[4] Disciplined Experiments (Validation Selection -> Held-Out Test Verification):")
     exp_defs = [
-        ("E0_Baseline_p050", dict(symmetrize=False, thr=0.50, use_prior=False, adx_min=None, di_agree=False)),
+        ("E0_Model_Threshold", dict(symmetrize=True, thr=thr, use_prior=False, adx_min=None, di_agree=False)),
         ("E1_MirrorSymmetrized_p050", dict(symmetrize=True, thr=0.50, use_prior=False, adx_min=None, di_agree=False)),
         ("E2_MetaThreshold_p054", dict(symmetrize=True, thr=0.54, use_prior=False, adx_min=None, di_agree=False)),
         ("E3_PriorCalibrated_Breakeven", dict(symmetrize=True, thr=0.0, use_prior=True, adx_min=None, di_agree=False)),
@@ -318,7 +275,7 @@ def main():
             prior_tp = float(tr["y_meta"].mean())
             for part_name, part_df in (("val", va), ("test", te)):
                 pr = compute_cascade_predictions(
-                    part_df, scaler, xgb_dir, lstm_dir, meta_gate, symmetrize=params["symmetrize"]
+                    part_df, model, symmetrize=params["symmetrize"]
                 )
                 active = pr["warmup_mask"].copy()
                 if params["use_prior"]:

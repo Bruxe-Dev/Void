@@ -13,7 +13,7 @@ import os
 import time
 from datetime import datetime, timezone
 
-import MetaTrader5 as mt5
+from void_fx.mt5_compat import mt5
 
 from void_fx import config
 from void_fx.execution import mt5_gateway as gw

@@ -46,7 +46,7 @@ def fetch_bars(symbol: str) -> tuple[pd.DataFrame, float]:
         df = pd.read_csv(cache, index_col="time", parse_dates=True)
         return df, json.loads(meta.read_text())["point"]
 
-    import MetaTrader5 as mt5
+    from void_fx.mt5_compat import mt5
     if not mt5.initialize(path=MT5_PATH):
         raise RuntimeError(f"MT5 initialize failed: {mt5.last_error()}")
     try:

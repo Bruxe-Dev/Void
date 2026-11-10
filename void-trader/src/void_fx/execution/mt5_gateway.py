@@ -11,7 +11,7 @@ from __future__ import annotations
 import math
 import time
 
-import MetaTrader5 as mt5
+from void_fx.mt5_compat import mt5
 
 from void_fx.execution.risk_manager import BUY, SELL, AccountSnapshot, ExposureItem, InstrumentSpec
 

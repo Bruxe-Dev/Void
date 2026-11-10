@@ -5,14 +5,98 @@ Summary: Hierarchical Stacked-Ensemble Algorithmic Forex Trading System for MT5
 Author: Void Trading
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
-Requires-Dist: MetaTrader5
+Requires-Dist: MetaTrader5; sys_platform == "win32"
 Requires-Dist: numpy
 Requires-Dist: pandas
 Requires-Dist: torch
 Requires-Dist: xgboost
 Requires-Dist: scikit-learn
 
-In order to force the logs into a File this will be the new script I'll need to run
+# Void FX (Void Trader): Hierarchical Stacked-Ensemble Algorithmic Forex Trading
 
-# # On Windows PowerShell (Standard in VS Code)
-- python -u live_forex_expert.py | Tee-Object -FilePath "trading_logs.txt"
+Automated H1 Forex prediction and trading system interfacing with MetaTrader 5 (MT5) targeting **EURUSD** and **GBPUSD**, with mandatory account-size-aware risk management and a pre-submission `OrderGate`.
+
+---
+
+## 1. Architecture Overview
+
+1. **Data & Features Engine (`src/void_fx/features/`):**
+   - Causal, look-ahead-free H1 feature engineering (`build_cascade_features` for v2 Cascade; `prepare_live_features` for v1 Legacy).
+   - Antisymmetric (`ret_1`, `ret_4`, `ret_24`, `di_spread`, `range_pos_24`) and symmetric (`adx_n`, `hurst`, `log_atr_pct`, `atr_ratio`, `hour_sin`, `hour_cos`) decomposition enabling exact chart-inversion mirror augmentation.
+   - Wilder's Average Directional Index (ADX) with Schmitt-trigger hysteresis and Rolling Hurst Exponent regime diagnostics (`src/void_fx/features/regime.py`).
+
+2. **Bidirectional Cascade Alpha Engine (`models/cascade/` — Current H1 Baseline):**
+   - **Stage 1 (Direction Discovery):** XGBoost (`xgb_dir.pkl`) + 2-layer PyTorch LSTM (`lstm_dir.pth`) trained on symmetric $\pm 1.0 \times \text{ATR}(14)$ barriers over 24 H1 bars with mirror augmentation and Lopez de Prado average uniqueness sample weights.
+   - **Stage 2 (Meta-Manager Risk Gate):** Logistic Regression (`meta_gate.pkl`) evaluating whether a 2:1 reward:risk bracket ($\text{TP}=+2.0\text{ATR}, \text{SL}=-1.0\text{ATR}$) in the proposed direction reaches expansion TP before SL/expiry.
+
+3. **Centralized Risk Manager & Pre-Submission Order Gate (`src/void_fx/execution/`):**
+   - `risk_manager.py`: Broker-agnostic, account-size-aware sizing and hard risk validation. Sizes every trade from `min(balance, equity)`, floors volume strictly **down** to `volume_step`, and **skips** trades when `volume_min` would exceed the per-trade risk budget or margin cap (never rounds up).
+   - `mt5_gateway.py`: Read-only adapter pulling authoritative live account state, contract specs, tick values, margin requirements (`order_calc_margin`), stop-loss monetary risk (`order_calc_profit`), open positions/pending orders, and daily deal history.
+   - `order_gate.py`: Single order-submission boundary enforcing demo-only protection (`ALLOW_LIVE_TRADING=False`), emergency stop file (`STOP_TRADING`), per-trade risk (1%), max open risk (2%), max daily loss (3% reset at 00:00 UTC), max drawdown halt (10% persistent in `state/risk_state.json`), max margin utilization (30%), max concurrent positions (2 total / 1 per symbol), max consecutive losses (4/day), and per-bar idempotency.
+
+4. **Account-Aware Backtester (`src/void_fx/backtest/engine.py`):**
+   - Simulates H1 execution across arbitrary starting balances (`$50`, `$100`, `$500`, `$100,000`) using the exact same `validate_order` and `size_position` rules as live execution, accounting for spread, commission, slippage, swap, unrealized P&L, and margin.
+
+---
+
+## 2. Environment Setup & Dependency Installation
+
+All commands assume working directory `D:\Void\void-trader` and the Conda environment `C:\Users\HP\anaconda3\envs\void\python.exe`.
+
+```powershell
+# Verify Python environment and packages
+C:\Users\HP\anaconda3\envs\void\python.exe -m pip install -r requirements.txt
+C:\Users\HP\anaconda3\envs\void\python.exe -m pip install -e . --no-build-isolation --no-deps
+```
+
+---
+
+## 3. Verified Operating Commands
+
+### 1. Run Full Automated Test Suite (Unit, Risk Manager, Backtester & Model Smoke Tests)
+```powershell
+C:\Users\HP\anaconda3\envs\void\python.exe -m pytest tests -v -p no:cacheprovider
+```
+
+### 2. Run Reproducible H1 Baseline Evaluation, Account-Size Scenarios ($50/$100/$500/$100k) & Experiments
+```powershell
+C:\Users\HP\anaconda3\envs\void\python.exe scripts/evaluate_h1_baseline.py
+```
+
+### 3. Dry-Run One Live Cycle (Validates MT5 Connection, Inference & Risk Gate Without Sending Orders)
+```powershell
+C:\Users\HP\anaconda3\envs\void\python.exe -u scripts/live_cascade_expert.py --dry-run --once
+```
+
+### 4. Run Live Demo Trading Bot (Bidirectional Cascade H1 Baseline)
+```powershell
+C:\Users\HP\anaconda3\envs\void\python.exe -u scripts/live_cascade_expert.py | Tee-Object -FilePath "trading_logs.txt" -Append
+```
+
+### 5. Run Legacy v1 Demo Bot (Long-Only Fallback, Protected by OrderGate)
+```powershell
+C:\Users\HP\anaconda3\envs\void\python.exe -u scripts/live_forex_expert.py --dry-run --once
+```
+
+### 6. Train a Separate Candidate Model (Preserves `models/cascade/` Baseline Checkpoint)
+```powershell
+# Writes candidate artifacts to models/cascade_candidate/ (never overwrites models/cascade/ unless --overwrite-baseline is passed)
+C:\Users\HP\anaconda3\envs\void\python.exe scripts/train_cascade.py --output-dir models/cascade_candidate
+```
+
+### 7. Calibrate Regime Filter Thresholds (Read-Only)
+```powershell
+C:\Users\HP\anaconda3\envs\void\python.exe scripts/calibrate_regime.py
+```
+
+---
+
+## 4. Safe Shutdown & Emergency Controls
+
+- **Normal Shutdown:** Press `Ctrl+C` in the terminal running `live_cascade_expert.py`. The runner catches `KeyboardInterrupt`, calls `mt5.shutdown()`, and exits cleanly. Existing broker-side SL/TP brackets remain active on the MT5 server.
+- **Immediate Emergency Halt (No Process Restart Required):** Create the file `D:\Void\void-trader\STOP_TRADING`:
+  ```powershell
+  New-Item -ItemType File -Path D:\Void\void-trader\STOP_TRADING -Force
+  ```
+  `OrderGate` checks for `STOP_TRADING` before every submission and immediately rejects new orders while leaving existing positions intact.
+- **Resetting a Max-Drawdown Halt:** If equity drops $\ge 10\%$ below high-water mark, `state/risk_state.json` records `"halted": true`. Inspect the account, then edit or remove `state/risk_state.json` to resume demo testing.

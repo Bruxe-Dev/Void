@@ -25,6 +25,32 @@ Automated H1 Forex prediction and trading system interfacing with MetaTrader 5 (
 
 ---
 
+## 0. Ubuntu / Colab Quick Start (v3)
+
+```bash
+# Local (Ubuntu): training, backtests, tests. MetaTrader5 is skipped automatically on Linux.
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt && pip install -e . --no-deps
+pytest tests -q
+
+# Train on a Colab GPU (needs the `colab` CLI authenticated); models -> models/cascade_candidate/
+./scripts/colab_train.sh T4
+
+# Inspect the honest held-out report
+cat models/cascade_candidate/cascade_config.json
+python scripts/evaluate_h1_baseline.py --model-dir models/cascade_candidate
+
+# Promote only if "approved": true
+cp models/cascade_candidate/* models/cascade/
+```
+
+Live trading needs the Windows-only `MetaTrader5` package, so run the live bot on a Windows
+machine/VPS with the MT5 terminal. The live bot refuses to trade models whose
+`cascade_config.json` has `"approved": false` (override for demo tests: `VOID_ALLOW_UNAPPROVED=1`).
+Optional env vars: `MT5_ACCOUNT`, `MT5_PATH`.
+
+---
+
 ## 2. Environment Setup & Dependency Installation
 
 All commands assume working directory `D:\Void\void-trader` and the Conda environment `C:\Users\HP\anaconda3\envs\void\python.exe`.

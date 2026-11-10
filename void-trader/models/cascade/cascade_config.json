@@ -1,0 +1,70 @@
+{
+  "version": 3,
+  "meta_features": "side_aligned_v3",
+  "lstm_hidden": 64,
+  "lstm_layers": 2,
+  "blend_w_xgb": 1.0,
+  "threshold": 0.52,
+  "cost_pips": 1.0,
+  "approved": true,
+  "trained_at": "2026-11-10T15:04:29.999977+00:00",
+  "device": "cpu",
+  "xgb_trees": 40,
+  "lstm_epochs": 1,
+  "validation": {
+    "trades": 81,
+    "win_rate": 49.38,
+    "avg_r": 0.3692,
+    "total_r": 29.91,
+    "profit_factor": 1.671,
+    "max_dd_r": 5.75,
+    "t_stat": 2.23
+  },
+  "test": {
+    "random_side": {
+      "trades": 811,
+      "win_rate": 38.59,
+      "avg_r": 0.0474,
+      "total_r": 38.45,
+      "profit_factor": 1.073,
+      "max_dd_r": 38.25,
+      "t_stat": 0.95
+    },
+    "direction_only": {
+      "trades": 787,
+      "win_rate": 38.37,
+      "avg_r": 0.0394,
+      "total_r": 31.05,
+      "profit_factor": 1.06,
+      "max_dd_r": 24.23,
+      "t_stat": 0.78
+    },
+    "gated": {
+      "trades": 91,
+      "win_rate": 49.45,
+      "avg_r": 0.3601,
+      "total_r": 32.77,
+      "profit_factor": 1.657,
+      "max_dd_r": 7.48,
+      "t_stat": 2.32
+    },
+    "gated_EURUSD": {
+      "trades": 45,
+      "win_rate": 44.44,
+      "avg_r": 0.2196,
+      "total_r": 9.88,
+      "profit_factor": 1.363,
+      "max_dd_r": 4.68,
+      "t_stat": 0.99
+    },
+    "gated_GBPUSD": {
+      "trades": 46,
+      "win_rate": 54.35,
+      "avg_r": 0.4976,
+      "total_r": 22.89,
+      "profit_factor": 2.01,
+      "max_dd_r": 4.27,
+      "t_stat": 2.27
+    }
+  }
+}

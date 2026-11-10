@@ -3,7 +3,7 @@
 import json
 from pathlib import Path
 
-import MetaTrader5 as mt5
+from void_fx.mt5_compat import mt5
 import pandas as pd
 
 from void_fx.config import ACCOUNT_NUMBER, MT5_PATH, RAW_DATA_DIR, SYMBOL

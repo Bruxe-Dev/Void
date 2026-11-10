@@ -21,11 +21,21 @@ import pandas as pd
 from void_fx.config import ATR_PERIOD
 from void_fx.features.regime import compute_regime_features
 
-ANTISYMMETRIC_COLS = ["ret_1", "ret_4", "ret_24", "di_spread", "range_pos_24"]
-SYMMETRIC_COLS = ["adx_n", "hurst", "log_atr_pct", "atr_ratio", "hour_sin", "hour_cos"]
+# v2 feature set (kept so pre-v3 checkpoints still load: their scaler.json lists these)
+ANTISYMMETRIC_COLS_V2 = ["ret_1", "ret_4", "ret_24", "di_spread", "range_pos_24"]
+SYMMETRIC_COLS_V2 = ["adx_n", "hurst", "log_atr_pct", "atr_ratio", "hour_sin", "hour_cos"]
+CASCADE_FEATURE_COLS_V2 = ANTISYMMETRIC_COLS_V2 + SYMMETRIC_COLS_V2
+
+# v3 additions: multi-day trend / momentum context (time-series momentum is the
+# best-documented source of edge in FX) + weekly seasonality + vol-of-vol.
+ANTISYMMETRIC_COLS_V3 = ["ret_120", "ret_240", "ema50_dist", "ema200_dist", "ema50_slope", "range_pos_120"]
+SYMMETRIC_COLS_V3 = ["dow_sin", "dow_cos", "rv_ratio"]
+
+ANTISYMMETRIC_COLS = ANTISYMMETRIC_COLS_V2 + ANTISYMMETRIC_COLS_V3
+SYMMETRIC_COLS = SYMMETRIC_COLS_V2 + SYMMETRIC_COLS_V3
 CASCADE_FEATURE_COLS = ANTISYMMETRIC_COLS + SYMMETRIC_COLS
 
-# Longest look-back: regime filter (169 bars) + atr_ratio window (120) -> ~300 bars.
+# Longest look-back: ret_240 (10 FX trading days) + regime filter -> ~320 bars.
 MIN_HISTORY_BARS = 320
 
 
@@ -64,6 +74,23 @@ def build_cascade_features(raw: pd.DataFrame) -> pd.DataFrame:
     hour = df.index.hour
     df["hour_sin"] = np.sin(2 * np.pi * hour / 24.0)
     df["hour_cos"] = np.cos(2 * np.pi * hour / 24.0)
+
+    # ---- v3 multi-day context (all causal; antisymmetric ones are zero for a flat chart)
+    atr = df["volatility_atr"]
+    df["ret_120"] = log_ret.rolling(120).sum() / atr_pct / np.sqrt(120 / 24)
+    df["ret_240"] = log_ret.rolling(240).sum() / atr_pct / np.sqrt(240 / 24)
+    ema50 = close.ewm(span=50, adjust=False).mean()
+    ema200 = close.ewm(span=200, adjust=False).mean()
+    df["ema50_dist"] = (close - ema50) / atr
+    df["ema200_dist"] = (close - ema200) / atr
+    df["ema50_slope"] = (ema50 - ema50.shift(24)) / atr
+    hi120, lo120 = df["high"].rolling(120).max(), df["low"].rolling(120).min()
+    span120 = (hi120 - lo120).replace(0.0, np.nan)
+    df["range_pos_120"] = 2.0 * (close - lo120) / span120 - 1.0
+    dow = df.index.dayofweek
+    df["dow_sin"] = np.sin(2 * np.pi * dow / 7.0)
+    df["dow_cos"] = np.cos(2 * np.pi * dow / 7.0)
+    df["rv_ratio"] = np.log(log_ret.rolling(24).std() / log_ret.rolling(120).std())
     return df
 
 

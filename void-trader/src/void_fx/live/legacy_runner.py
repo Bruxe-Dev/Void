@@ -27,7 +27,7 @@ import time
 import traceback
 from datetime import datetime
 
-import MetaTrader5 as mt5
+from void_fx.mt5_compat import mt5
 import numpy as np
 import torch
 

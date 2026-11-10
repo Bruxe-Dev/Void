@@ -21,15 +21,13 @@ Usage: scripts/live_cascade_expert.py [--dry-run] [--once]
 """
 
 import argparse
-import json
-import pickle
+import os
 import time
 import traceback
 from datetime import datetime
 
-import MetaTrader5 as mt5
+from void_fx.mt5_compat import mt5
 import numpy as np
-import torch
 
 from void_fx.config import (
     ACCOUNT_NUMBER,
@@ -47,89 +45,59 @@ from void_fx.config import (
 from void_fx.data.mt5_client import connect_to_mt5, rates_to_frame
 from void_fx.execution.order_gate import OrderGate
 from void_fx.execution.risk_manager import BUY, SELL, OrderIntent
-from void_fx.features.cascade import (
-    CASCADE_FEATURE_COLS,
-    FeatureScaler,
-    build_cascade_features,
-)
-from void_fx.models.lstm import ForexLSTMAnalyst
+from void_fx.features.cascade import build_cascade_features
+from void_fx.models.cascade_infer import CascadeModel
 
 # Execution hyperparameters
 TIMEFRAME = mt5.TIMEFRAME_H1
 MAX_SPREAD_PIPS = 2.5       # Spread shield: skip execution if broker spread widens past 2.5 pips
-PROBABILITY_THRESHOLD = 0.50 # Meta-Gate entry cutoff
+# Meta-Gate entry cutoff. v3 checkpoints carry their own validated threshold in
+# cascade_config.json; this value is only used for pre-v3 checkpoints.
+PROBABILITY_THRESHOLD = 0.50
+# Safety: refuse to trade models whose held-out test was not profitable after costs.
+# Set env VOID_ALLOW_UNAPPROVED=1 only for demo experiments.
+REQUIRE_APPROVED_MODELS = os.environ.get("VOID_ALLOW_UNAPPROVED", "0") != "1"
 
 # Model cache
-xgb_dir = None
-lstm_dir = None
-meta_gate = None
-scaler = None
+model: CascadeModel | None = None
 
 
 def load_cascade_models():
-    global xgb_dir, lstm_dir, meta_gate, scaler
-    print("[*] Loading Bidirectional Cascade Models from disk...")
-
-    with open(CASCADE_MODELS_DIR / "scaler.json", "r") as f:
-        scaler = FeatureScaler.from_dict(json.load(f))
-
-    with open(CASCADE_MODELS_DIR / "xgb_dir.pkl", "rb") as f:
-        xgb_dir = pickle.load(f)
-
-    with open(CASCADE_MODELS_DIR / "meta_gate.pkl", "rb") as f:
-        meta_gate = pickle.load(f)
-
-    lstm_dir = ForexLSTMAnalyst(
-        input_dim=len(CASCADE_FEATURE_COLS),
-        hidden_dim=64,
-        output_dim=2,
-        num_layers=2
-    )
-    lstm_dir.load_state_dict(torch.load(CASCADE_MODELS_DIR / "lstm_dir.pth", weights_only=True))
-    lstm_dir.eval()
-    print("[+] All Bidirectional Cascade Models loaded successfully!")
+    global model, PROBABILITY_THRESHOLD
+    print(f"[*] Loading Bidirectional Cascade Models from {CASCADE_MODELS_DIR} ...")
+    model = CascadeModel.load(CASCADE_MODELS_DIR)
+    if model.config.get("version", 2) >= 3:
+        PROBABILITY_THRESHOLD = model.threshold
+    print(f"[+] Cascade models loaded (v{model.config.get('version')}, threshold={PROBABILITY_THRESHOLD:.2f}, "
+          f"approved={model.approved}).")
 
 
 def predict_cascade(df_closed):
     """
-    Pure inference on CLOSED bars (identical math to the original live cycle).
-    Returns dict(atr, xgb, lstm, p_long, p_short, direction, p_expansion, bar_time).
-    Raises ValueError on insufficient or non-finite inputs.
+    Pure inference on CLOSED bars via the shared CascadeModel (same math as training
+    and evaluation). Returns dict(atr, xgb, lstm, p_long, p_short, direction,
+    p_expansion, bar_time). Raises ValueError on insufficient or non-finite inputs.
     """
-    if xgb_dir is None or lstm_dir is None or meta_gate is None or scaler is None:
+    if model is None:
         load_cascade_models()
     feats_df = build_cascade_features(df_closed)
-    valid_feats = feats_df.dropna(subset=CASCADE_FEATURE_COLS)
+    cols = model.feature_cols
+    valid_feats = feats_df.replace([np.inf, -np.inf], np.nan).dropna(subset=cols)
     if len(valid_feats) < LOOKBACK_WINDOW:
         raise ValueError(f"Insufficient history: {len(valid_feats)} < {LOOKBACK_WINDOW}")
-
-    current_atr = valid_feats["volatility_atr"].iloc[-1]
-    X_raw = valid_feats[CASCADE_FEATURE_COLS].values
-    X_norm = scaler.transform(X_raw)
-    X_2d_live = X_norm[-1:]
-    X_3d_live = np.array([X_norm[-LOOKBACK_WINDOW:]], dtype=np.float32)
-    if not (np.isfinite(X_3d_live).all() and np.isfinite(current_atr) and current_atr > 0):
-        raise ValueError("Non-finite features or ATR in the inference window")
     if valid_feats.index[-1] != df_closed.index[-1]:
         raise ValueError(f"Latest closed bar {df_closed.index[-1]} has no valid features")
 
-    # STAGE 1: DIRECTION INFERENCE
-    xgb_dir_probs = xgb_dir.predict_proba(X_2d_live)[0]  # [P(Short), P(Long)]
-    with torch.no_grad():
-        lstm_logits = lstm_dir(torch.tensor(X_3d_live))
-        lstm_dir_probs = torch.softmax(lstm_logits, dim=1).numpy()[0]
+    current_atr = valid_feats["volatility_atr"].iloc[-1]
+    X_norm = model.scaler.transform(valid_feats[cols].values[-LOOKBACK_WINDOW:])
+    if not (np.isfinite(X_norm).all() and np.isfinite(current_atr) and current_atr > 0):
+        raise ValueError("Non-finite features or ATR in the inference window")
 
-    # Blended direction score
-    p_long_blend = 0.5 * xgb_dir_probs[1] + 0.5 * lstm_dir_probs[1]
-    p_short_blend = 0.5 * xgb_dir_probs[0] + 0.5 * lstm_dir_probs[0]
-    proposed_direction = 1 if p_long_blend >= p_short_blend else -1
-
-    # STAGE 2: META-MANAGER GATE INFERENCE
-    X_meta_live = np.hstack([X_2d_live, [xgb_dir_probs]])
-    p_expansion = meta_gate.predict_proba(X_meta_live)[0, 1]
-    return dict(atr=float(current_atr), xgb=xgb_dir_probs, lstm=lstm_dir_probs, p_long=float(p_long_blend),
-                p_short=float(p_short_blend), direction=proposed_direction, p_expansion=float(p_expansion),
-                bar_time=df_closed.index[-1])
+    out = model.predict_norm(X_norm)
+    px, pl, p_long = float(out["p_long_xgb"][-1]), float(out["p_long_lstm"][-1]), float(out["p_long"][-1])
+    return dict(atr=float(current_atr), xgb=np.array([1 - px, px]), lstm=np.array([1 - pl, pl]),
+                p_long=p_long, p_short=1.0 - p_long, direction=int(out["direction"][-1]),
+                p_expansion=float(out["p_expansion"][-1]), bar_time=df_closed.index[-1])
 
 
 def run_cascade_trading_cycle(gate: OrderGate):
@@ -174,6 +142,11 @@ def run_cascade_trading_cycle(gate: OrderGate):
         bot_positions = [p for p in open_positions if p.magic == MAGIC_NUMBER]
         if bot_positions:
             print(f"[!] Active trade already running (Ticket: {bot_positions[0].ticket}, Type: {'BUY' if bot_positions[0].type==0 else 'SELL'}). Skipping.")
+            return
+
+        if REQUIRE_APPROVED_MODELS and not model.approved:
+            print("[-] Loaded models are NOT approved (held-out test not profitable after costs). "
+                  "Signal logged only; no order sent. Retrain, or set VOID_ALLOW_UNAPPROVED=1 for demo tests.")
             return
 
         if pred["p_expansion"] < PROBABILITY_THRESHOLD:
