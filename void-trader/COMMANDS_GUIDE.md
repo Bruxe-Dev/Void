@@ -15,7 +15,7 @@ cd D:\Void\void-trader
 
 ---
 
-## 1. Switching from the Old Running Bot to the Upgraded Bot (Run Tomorrow After Your Current Trade Closes)
+## 1. Switching from the Old Running Bot to the Upgraded Bot
 
 ### A. Check if an old bot process is still running
 ```powershell
